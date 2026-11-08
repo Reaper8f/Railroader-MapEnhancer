@@ -20,9 +20,15 @@ exit /b %EXIT_CODE%
 # ======================================================================
 # Railroader Map Enhancer - Automated Installer & Updater (PowerShell)
 # Preserves user settings.json, custom Backgrounds, and offline Tiles.
+# Auto-syncs tiles and archives from download folders into Documents\Railroader\Mods.
 # ======================================================================
 
 $ErrorActionPreference = "Stop"
+
+$USGS_HASH = "F6B4499A2D4F301BAFD108525415E53B6026396DC5B2DC3252D334864D31BE99"
+$USGS_EXPECTED_TILES = 5101
+$OSM_HASH = "40587516F526027644A593829D23F590A20DFC00280204137C0B72B03322AE5E"
+$OSM_EXPECTED_TILES = 23315
 
 function Write-Header {
     Write-Host ""
@@ -50,6 +56,27 @@ function Write-WarningMessage {
 function Write-ErrorMessage {
     param([string]$Message)
     Write-Host "  [FAIL] $Message" -ForegroundColor Red
+}
+
+function Find-LocalZip {
+    param(
+        [string]$FileName,
+        [string]$SourceDir
+    )
+    $searchLocations = @(
+        (Join-Path $SourceDir $FileName),
+        (Join-Path (Join-Path $SourceDir "..") $FileName),
+        (Join-Path $env:USERPROFILE "Downloads\$FileName")
+    )
+    $oneDriveDownloads = Join-Path $env:USERPROFILE "OneDrive\Downloads\$FileName"
+    if (Test-Path -LiteralPath $oneDriveDownloads) { $searchLocations += $oneDriveDownloads }
+
+    foreach ($loc in $searchLocations) {
+        if (Test-Path -LiteralPath $loc) {
+            return (Resolve-Path $loc).Path
+        }
+    }
+    return $null
 }
 
 try {
@@ -128,6 +155,14 @@ try {
         (Join-Path $env:USERPROFILE "OneDrive\Documents\Railroader\Mods")
     )
 
+    try {
+        $regPersonal = (Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "Personal" -ErrorAction SilentlyContinue).Personal
+        if ($regPersonal) {
+            $expandedPersonal = [System.Environment]::ExpandEnvironmentVariables($regPersonal)
+            $candidatePaths += (Join-Path $expandedPersonal "Railroader\Mods")
+        }
+    } catch {}
+
     $modsDir = $null
     foreach ($cand in $candidatePaths) {
         if (Test-Path -LiteralPath $cand) {
@@ -188,7 +223,7 @@ try {
         $hasSettings = $true
     }
 
-    # Check custom Backgrounds
+    # Check custom Backgrounds in destination
     $bgDir = Join-Path $targetModDir "Backgrounds"
     $existingBgCount = 0
     if (Test-Path -LiteralPath $bgDir) {
@@ -203,7 +238,7 @@ try {
         Write-Success "Migrated custom Backgrounds from legacy directory."
     }
 
-    # Check offline Tiles
+    # Check offline Tiles in destination
     $tilesDir = Join-Path $targetModDir "Tiles"
     $existingTileCount = 0
     if (Test-Path -LiteralPath $tilesDir) {
@@ -211,7 +246,7 @@ try {
         $pngTileCount = (Get-ChildItem -LiteralPath $tilesDir -Recurse -File -Filter "*.png" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^\d+[-_]\d+[-_]\d+\.png$' -or $_.Directory.Name -match '^\d+$' }).Count
         $totalTilesFound = $existingTileCount + $pngTileCount
         if ($totalTilesFound -gt 0) {
-            Write-Success "Preserved existing offline Tiles folder ($totalTilesFound map tiles intact)."
+            Write-Success "Preserved existing offline Tiles in game folder ($totalTilesFound map tiles intact)."
         }
     } elseif ($legacyFound -and (Test-Path (Join-Path $legacyFound "Tiles"))) {
         Write-Info "Migrating offline Tiles from legacy mod folder..."
@@ -233,10 +268,9 @@ try {
 
     # 6. Copy / Update Mod Files
     if (-not $isSameDir) {
-        Write-Info "Installing mod files to: $targetModDir"
+        Write-Info "Installing mod binaries and UI assets to: $targetModDir"
         New-Item -ItemType Directory -Force -Path $targetModDir | Out-Null
 
-        # Files to copy
         $filesToCopy = @(
             "Info.json",
             "MapEnhancer.dll",
@@ -273,7 +307,23 @@ try {
             Copy-Item -Force -LiteralPath $bgSampleSrc -Destination (Join-Path $bgDir "calibration.sample.json")
         }
 
-        # Initialize Tiles directories and readme without overwriting existing tiles
+        # Sync custom Backgrounds if user put them in source download directory
+        $srcBgDir = Join-Path $sourceDir "Backgrounds"
+        if (Test-Path -LiteralPath $srcBgDir) {
+            $srcBgFiles = Get-ChildItem -LiteralPath $srcBgDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -ne "README.txt" -and $_.Name -ne "calibration.sample.json" }
+            if ($srcBgFiles.Count -gt 0) {
+                Write-Info "Found $($srcBgFiles.Count) custom backgrounds in download folder. Syncing into game directory..."
+                foreach ($bgf in $srcBgFiles) {
+                    $destBg = Join-Path $bgDir $bgf.Name
+                    if (-not (Test-Path -LiteralPath $destBg)) {
+                        Copy-Item -LiteralPath $bgf.FullName -Destination $destBg -Force
+                    }
+                }
+                Write-Success "Custom backgrounds synced to game directory."
+            }
+        }
+
+        # Initialize Tiles directories in game folder
         $usgsDir = Join-Path $tilesDir "USGSTopo"
         $osmDir = Join-Path $tilesDir "OSM"
         New-Item -ItemType Directory -Force -Path $usgsDir | Out-Null
@@ -281,6 +331,85 @@ try {
         $tilesReadmeSrc = Join-Path $sourceDir "Tiles\README.txt"
         if ((Test-Path $tilesReadmeSrc) -and -not (Test-Path (Join-Path $tilesDir "README.txt"))) {
             Copy-Item -Force -LiteralPath $tilesReadmeSrc -Destination (Join-Path $tilesDir "README.txt")
+        }
+
+        # Sync offline Tiles from source download folder into game directory if present
+        $srcTilesDir = Join-Path $sourceDir "Tiles"
+        if (Test-Path -LiteralPath $srcTilesDir) {
+            $srcUsgsDir = Join-Path $srcTilesDir "USGSTopo"
+            $srcOsmDir = Join-Path $srcTilesDir "OSM"
+
+            $srcUsgsFiles = if (Test-Path -LiteralPath $srcUsgsDir) { (Get-ChildItem -LiteralPath $srcUsgsDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".tile" -or $_.Extension -eq ".png" }) } else { @() }
+            $srcOsmFiles = if (Test-Path -LiteralPath $srcOsmDir) { (Get-ChildItem -LiteralPath $srcOsmDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".tile" -or $_.Extension -eq ".png" }) } else { @() }
+
+            $totalSrcTiles = $srcUsgsFiles.Count + $srcOsmFiles.Count
+            if ($totalSrcTiles -gt 0) {
+                Write-Info "Found $totalSrcTiles offline tiles in download folder. Syncing into game directory..."
+                if ($srcUsgsFiles.Count -gt 0) {
+                    foreach ($f in $srcUsgsFiles) {
+                        $destTile = Join-Path $usgsDir $f.Name
+                        if (-not (Test-Path -LiteralPath $destTile) -or ((Get-Item -LiteralPath $destTile).Length -ne $f.Length)) {
+                            Copy-Item -LiteralPath $f.FullName -Destination $destTile -Force
+                        }
+                    }
+                }
+                if ($srcOsmFiles.Count -gt 0) {
+                    foreach ($f in $srcOsmFiles) {
+                        $destTile = Join-Path $osmDir $f.Name
+                        if (-not (Test-Path -LiteralPath $destTile) -or ((Get-Item -LiteralPath $destTile).Length -ne $f.Length)) {
+                            Copy-Item -LiteralPath $f.FullName -Destination $destTile -Force
+                        }
+                    }
+                }
+                Write-Success "Offline tiles synced from download folder into game directory ($totalSrcTiles tiles ready)."
+            }
+        }
+
+        # Check for pre-downloaded tile zip archives in source or Downloads folder
+        $tilePacksToCheck = @(
+            @{
+                Name = "USGS Topographic Corridor Pack";
+                ZipName = "MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip";
+                ExpectedHash = $USGS_HASH;
+                TargetDir = $usgsDir;
+                ExpectedCount = $USGS_EXPECTED_TILES;
+            },
+            @{
+                Name = "OpenStreetMap Corridor Pack";
+                ZipName = "MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip";
+                ExpectedHash = $OSM_HASH;
+                TargetDir = $osmDir;
+                ExpectedCount = $OSM_EXPECTED_TILES;
+            }
+        )
+
+        foreach ($tp in $tilePacksToCheck) {
+            $currentCount = (Get-ChildItem -LiteralPath $tp.TargetDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".tile" -or $_.Extension -eq ".png" }).Count
+            if ($currentCount -lt $tp.ExpectedCount) {
+                $foundZip = Find-LocalZip -FileName $tp.ZipName -SourceDir $sourceDir
+                if ($foundZip) {
+                    Write-Info "Found local archive: $foundZip"
+                    Write-Host "  Verifying SHA256 integrity..." -NoNewline -ForegroundColor Gray
+                    $computedHash = (Get-FileHash -LiteralPath $foundZip -Algorithm SHA256).Hash.ToUpper()
+                    if ($computedHash -eq $tp.ExpectedHash) {
+                        Write-Host " VERIFIED [OK]" -ForegroundColor Green
+                        Write-Info "Extracting $($tp.Name) into game directory: $($tp.TargetDir)..."
+                        Add-Type -AssemblyName System.IO.Compression.FileSystem
+                        $zip = [System.IO.Compression.ZipFile]::OpenRead($foundZip)
+                        $entryCount = 0
+                        foreach ($entry in $zip.Entries) {
+                            if ($entry.FullName.EndsWith("/") -or $entry.FullName.EndsWith("\")) { continue }
+                            $leaf = Split-Path -Leaf $entry.FullName
+                            [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $tp.TargetDir $leaf), $true)
+                            $entryCount++
+                        }
+                        $zip.Dispose()
+                        Write-Success "$($tp.Name) installed into game directory ($entryCount tiles extracted)."
+                    } else {
+                        Write-Host " MISMATCH (File incomplete or corrupted, skipping auto-extract)" -ForegroundColor Yellow
+                    }
+                }
+            }
         }
 
         Write-Success "Mod files and assets copied successfully."
@@ -292,11 +421,22 @@ try {
         Write-Success "User settings restored and verified at: $settingsPath"
     }
 
-    # 8. Check for installed map tiles and provide recommendations
+    # 8. Check for installed map tiles in game directory and provide recommendations
+    $tilesDir = Join-Path $targetModDir "Tiles"
     $totalTilesInstalled = 0
+    $usgsCount = 0
+    $osmCount = 0
+
     if (Test-Path -LiteralPath $tilesDir) {
-        $totalTilesInstalled = (Get-ChildItem -LiteralPath $tilesDir -Recurse -File -Filter "*.tile" -ErrorAction SilentlyContinue).Count
-        $totalTilesInstalled += (Get-ChildItem -LiteralPath $tilesDir -Recurse -File -Filter "*.png" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^\d+[-_]\d+[-_]\d+\.png$' -or $_.Directory.Name -match '^\d+$' }).Count
+        $usgsDir = Join-Path $tilesDir "USGSTopo"
+        $osmDir = Join-Path $tilesDir "OSM"
+        if (Test-Path -LiteralPath $usgsDir) {
+            $usgsCount = (Get-ChildItem -LiteralPath $usgsDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".tile" -or $_.Extension -eq ".png" }).Count
+        }
+        if (Test-Path -LiteralPath $osmDir) {
+            $osmCount = (Get-ChildItem -LiteralPath $osmDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".tile" -or $_.Extension -eq ".png" }).Count
+        }
+        $totalTilesInstalled = $usgsCount + $osmCount
     }
 
     Write-Host ""
@@ -312,15 +452,18 @@ try {
     }
 
     Write-Host "  Backgrounds:   " -NoNewline -ForegroundColor White
-    if ($existingBgCount -gt 0) {
-        Write-Host "PRESERVED ($existingBgCount custom background images)" -ForegroundColor Green
+    $bgCountInTarget = (Get-ChildItem -LiteralPath $bgDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -ne "README.txt" -and $_.Name -ne "calibration.sample.json" }).Count
+    if ($bgCountInTarget -gt 0) {
+        Write-Host "PRESERVED ($bgCountInTarget custom background images ready)" -ForegroundColor Green
     } else {
         Write-Host "Ready for custom images in 'Backgrounds\'" -ForegroundColor Gray
     }
 
     Write-Host "  Map Tiles:     " -NoNewline -ForegroundColor White
     if ($totalTilesInstalled -gt 0) {
-        Write-Host "PRESERVED ($totalTilesInstalled offline map tiles detected)" -ForegroundColor Green
+        Write-Host "READY ($totalTilesInstalled offline map tiles installed in game)" -ForegroundColor Green
+        Write-Host "                 - USGS Topographic: $usgsCount tiles" -ForegroundColor Gray
+        Write-Host "                 - OpenStreetMap:    $osmCount tiles" -ForegroundColor Gray
     } else {
         Write-Host "None installed (Optional offline corridor packs available)" -ForegroundColor Yellow
     }
@@ -355,4 +498,3 @@ catch {
     Write-Host ""
     exit 1
 }
-

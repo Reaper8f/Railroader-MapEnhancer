@@ -20,6 +20,8 @@ exit /b %EXIT_CODE%
 # ======================================================================
 # Railroader Map Enhancer - Offline Tile Downloader (PowerShell)
 # Downloads, verifies SHA256 checksums, and extracts offline corridor tiles.
+# Auto-detects downloaded archives in Downloads / source folder and
+# ensures all tiles are synced to the active Documents\Railroader\Mods folder.
 # ======================================================================
 
 $ErrorActionPreference = "Stop"
@@ -43,37 +45,45 @@ function Write-Header {
     Write-Host ""
 }
 
-function Locate-TilesDirectory {
+function Locate-GameModDirectory {
     $rawSrc = $env:SCRIPT_SOURCE
     if (-not $rawSrc) { $rawSrc = [System.AppDomain]::CurrentDomain.BaseDirectory }
     $sourceDir = (Resolve-Path $rawSrc).Path
 
-    # Check if run directly inside reaper-map-enhancer folder
-    if ((Test-Path (Join-Path $sourceDir "Info.json")) -or (Test-Path (Join-Path $sourceDir "Tiles"))) {
-        $tilesDir = Join-Path $sourceDir "Tiles"
-        New-Item -ItemType Directory -Force -Path $tilesDir | Out-Null
-        return $tilesDir
+    # 1. If script is already running inside Railroader\Mods\reaper-map-enhancer
+    if ($sourceDir -match '(?i)Railroader\\Mods\\reaper-map-enhancer' -or 
+        ($sourceDir -match '(?i)Railroader\\Mods' -and (Test-Path (Join-Path $sourceDir "Info.json")))) {
+        return $sourceDir
     }
 
-    # Otherwise, search Documents\Railroader\Mods\reaper-map-enhancer\Tiles
+    # 2. Search candidate user Documents paths (including OneDrive redirection)
     $myDocs = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::MyDocuments)
     $candidatePaths = @(
-        (Join-Path $myDocs "Railroader\Mods\reaper-map-enhancer\Tiles"),
-        (Join-Path $env:USERPROFILE "Documents\Railroader\Mods\reaper-map-enhancer\Tiles"),
-        (Join-Path $env:USERPROFILE "OneDrive\Documents\Railroader\Mods\reaper-map-enhancer\Tiles")
+        (Join-Path $myDocs "Railroader\Mods\reaper-map-enhancer"),
+        (Join-Path $env:USERPROFILE "Documents\Railroader\Mods\reaper-map-enhancer"),
+        (Join-Path $env:USERPROFILE "OneDrive\Documents\Railroader\Mods\reaper-map-enhancer")
     )
 
+    try {
+        $regPersonal = (Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -Name "Personal" -ErrorAction SilentlyContinue).Personal
+        if ($regPersonal) {
+            $expandedPersonal = [System.Environment]::ExpandEnvironmentVariables($regPersonal)
+            $candidatePaths += (Join-Path $expandedPersonal "Railroader\Mods\reaper-map-enhancer")
+        }
+    } catch {}
+
     foreach ($cand in $candidatePaths) {
-        if (Test-Path -LiteralPath (Split-Path -Parent $cand)) {
+        $parentMods = Split-Path -Parent $cand
+        if (Test-Path -LiteralPath $parentMods) {
             New-Item -ItemType Directory -Force -Path $cand | Out-Null
             return $cand
         }
     }
 
     # Default fallback
-    $defaultTiles = Join-Path $myDocs "Railroader\Mods\reaper-map-enhancer\Tiles"
-    New-Item -ItemType Directory -Force -Path $defaultTiles | Out-Null
-    return $defaultTiles
+    $defaultMod = Join-Path $myDocs "Railroader\Mods\reaper-map-enhancer"
+    New-Item -ItemType Directory -Force -Path $defaultMod | Out-Null
+    return $defaultMod
 }
 
 function Get-TileCounts {
@@ -98,85 +108,160 @@ function Get-TileCounts {
     }
 }
 
+function Sync-TilesFromFolder {
+    param(
+        [string]$SourceFolder,
+        [string]$TargetFolder,
+        [string]$PackSubDir
+    )
+    $srcPackDir = Join-Path $SourceFolder $PackSubDir
+    $tgtPackDir = Join-Path $TargetFolder $PackSubDir
+    if (-not (Test-Path -LiteralPath $srcPackDir)) { return 0 }
+
+    New-Item -ItemType Directory -Force -Path $tgtPackDir | Out-Null
+    $srcFiles = Get-ChildItem -LiteralPath $srcPackDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".tile" -or $_.Extension -eq ".png" }
+    if ($srcFiles.Count -eq 0) { return 0 }
+
+    Write-Host "  Syncing $($srcFiles.Count) $PackSubDir tiles from download folder into game directory..." -ForegroundColor Cyan
+    $copied = 0
+    foreach ($file in $srcFiles) {
+        $destPath = Join-Path $tgtPackDir $file.Name
+        if (-not (Test-Path -LiteralPath $destPath) -or ((Get-Item -LiteralPath $destPath).Length -ne $file.Length)) {
+            Copy-Item -LiteralPath $file.FullName -Destination $destPath -Force
+            $copied++
+        }
+    }
+    return $copied
+}
+
+function Find-LocalTileZip {
+    param(
+        [string]$FileName,
+        [string]$SourceDir
+    )
+    $searchLocations = @(
+        (Join-Path $SourceDir $FileName),
+        (Join-Path (Join-Path $SourceDir "..") $FileName),
+        (Join-Path $env:USERPROFILE "Downloads\$FileName")
+    )
+    $oneDriveDownloads = Join-Path $env:USERPROFILE "OneDrive\Downloads\$FileName"
+    if (Test-Path -LiteralPath $oneDriveDownloads) { $searchLocations += $oneDriveDownloads }
+
+    foreach ($loc in $searchLocations) {
+        if (Test-Path -LiteralPath $loc) {
+            return (Resolve-Path $loc).Path
+        }
+    }
+    return $null
+}
+
 function Download-And-Install-Pack {
     param (
         [string]$PackName,
         [string]$Url,
         [string]$ExpectedHash,
         [string]$TargetSubDir,
-        [int]$ExpectedTiles
+        [int]$ExpectedTiles,
+        [string]$SourceDir
     )
 
     Write-Host ""
     Write-Host "----------------------------------------------------------------------" -ForegroundColor DarkCyan
-    Write-Host " Downloading: $PackName" -ForegroundColor White
-    Write-Host " Source:      $Url" -ForegroundColor Gray
+    Write-Host " Package:     $PackName" -ForegroundColor White
     Write-Host " Destination: $TargetSubDir" -ForegroundColor Gray
     Write-Host "----------------------------------------------------------------------" -ForegroundColor DarkCyan
 
     New-Item -ItemType Directory -Force -Path $TargetSubDir | Out-Null
+
+    # 1. Check if the user already downloaded this zip (in source dir or Downloads folder)
+    $zipFileName = Split-Path -Leaf $Url
+    $existingLocalZip = Find-LocalTileZip -FileName $zipFileName -SourceDir $SourceDir
+    $zipToExtract = $null
+    $isTempZip = $false
+
+    if ($existingLocalZip) {
+        Write-Host "  Found local archive in: $existingLocalZip" -ForegroundColor Yellow
+        Write-Host "  Verifying package integrity (SHA256)..." -NoNewline -ForegroundColor Gray
+        $localHash = (Get-FileHash -LiteralPath $existingLocalZip -Algorithm SHA256).Hash.ToUpper()
+        if ($localHash -eq $ExpectedHash.ToUpper()) {
+            Write-Host " VERIFIED [OK]" -ForegroundColor Green
+            Write-Host "  Using verified local archive (skipping re-download)!" -ForegroundColor Green
+            $zipToExtract = $existingLocalZip
+        } else {
+            Write-Host " MISMATCH (Incomplete or corrupt local file)" -ForegroundColor Yellow
+            Write-Host "  Expected: $ExpectedHash" -ForegroundColor Gray
+            Write-Host "  Found:    $localHash" -ForegroundColor Gray
+            Write-Host "  Downloading a fresh, verified copy from GitHub..." -ForegroundColor Cyan
+        }
+    }
+
     $tempZip = Join-Path $env:TEMP ("ME_Tiles_" + [System.Guid]::NewGuid().ToString() + ".zip")
 
     try {
-        # Streaming Download with Progress
-        $req = [System.Net.HttpWebRequest]::Create($Url)
-        $req.Method = "GET"
-        $req.UserAgent = "MapEnhancer-TileDownloader/2.0"
-        $req.Timeout = 600000 # 10 minutes
-        $resp = $req.GetResponse()
-        $totalBytes = $resp.ContentLength
-        $respStream = $resp.GetResponseStream()
+        if (-not $zipToExtract) {
+            Write-Host "  Connecting to GitHub CDN..." -ForegroundColor Gray
+            $req = [System.Net.HttpWebRequest]::Create($Url)
+            $req.Method = "GET"
+            $req.UserAgent = "MapEnhancer-TileDownloader/2.0"
+            $req.Timeout = 600000 # 10 minutes
+            $resp = $req.GetResponse()
+            $totalBytes = $resp.ContentLength
+            $respStream = $resp.GetResponseStream()
 
-        $fileStream = New-Object System.IO.FileStream($tempZip, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
-        $buffer = New-Object byte[] 65536
-        $downloaded = 0
-        $sw = [System.Diagnostics.Stopwatch]::StartNew()
-        $lastReport = [System.Diagnostics.Stopwatch]::StartNew()
+            $fileStream = New-Object System.IO.FileStream($tempZip, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+            $buffer = New-Object byte[] 65536
+            $downloaded = 0
+            $sw = [System.Diagnostics.Stopwatch]::StartNew()
+            $lastReport = [System.Diagnostics.Stopwatch]::StartNew()
 
-        while (($bytesRead = $respStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
-            $fileStream.Write($buffer, 0, $bytesRead)
-            $downloaded += $bytesRead
+            while (($bytesRead = $respStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+                $fileStream.Write($buffer, 0, $bytesRead)
+                $downloaded += $bytesRead
 
-            if ($lastReport.ElapsedMilliseconds -ge 200 -or $downloaded -eq $totalBytes) {
-                $lastReport.Restart()
-                $pct = if ($totalBytes -gt 0) { [math]::Round(($downloaded / $totalBytes) * 100) } else { 0 }
-                $mbDownloaded = [math]::Round($downloaded / 1MB, 1)
-                $mbTotal = if ($totalBytes -gt 0) { [math]::Round($totalBytes / 1MB, 1) } else { "?" }
-                $speedMBs = if ($sw.Elapsed.TotalSeconds -gt 0) { [math]::Round(($downloaded / 1MB) / $sw.Elapsed.TotalSeconds, 2) } else { 0 }
-                $barLength = 20
-                $filled = [math]::Round(($pct / 100) * $barLength)
-                if ($filled -gt $barLength) { $filled = $barLength }
-                $bar = ("=" * $filled).PadRight($barLength, "-")
+                if ($lastReport.ElapsedMilliseconds -ge 200 -or $downloaded -eq $totalBytes) {
+                    $lastReport.Restart()
+                    $pct = if ($totalBytes -gt 0) { [math]::Round(($downloaded / $totalBytes) * 100) } else { 0 }
+                    $mbDownloaded = [math]::Round($downloaded / 1MB, 1)
+                    $mbTotal = if ($totalBytes -gt 0) { [math]::Round($totalBytes / 1MB, 1) } else { "?" }
+                    $speedMBs = if ($sw.Elapsed.TotalSeconds -gt 0) { [math]::Round(($downloaded / 1MB) / $sw.Elapsed.TotalSeconds, 2) } else { 0 }
+                    $barLength = 20
+                    $filled = [math]::Round(($pct / 100) * $barLength)
+                    if ($filled -gt $barLength) { $filled = $barLength }
+                    $bar = ("=" * $filled).PadRight($barLength, "-")
 
-                Write-Host -NoNewline "`r  [$bar] $pct% ($mbDownloaded / $mbTotal MB) @ $speedMBs MB/s    "
+                    Write-Host -NoNewline "`r  [$bar] $pct% ($mbDownloaded / $mbTotal MB) @ $speedMBs MB/s    "
+                }
             }
+
+            $fileStream.Flush()
+            $fileStream.Close()
+            $respStream.Close()
+            $resp.Close()
+            $sw.Stop()
+
+            Write-Host ""
+            Write-Host "  Download complete in $([math]::Round($sw.Elapsed.TotalSeconds, 1))s." -ForegroundColor Green
+
+            # Verify SHA256 Checksum
+            Write-Host "  Verifying package integrity (SHA256)..." -NoNewline -ForegroundColor Gray
+            $computedHash = (Get-FileHash -LiteralPath $tempZip -Algorithm SHA256).Hash.ToUpper()
+
+            if ($computedHash -ne $ExpectedHash.ToUpper()) {
+                Write-Host " MISMATCH!" -ForegroundColor Red
+                Write-Host "  Expected: $ExpectedHash" -ForegroundColor Red
+                Write-Host "  Received: $computedHash" -ForegroundColor Red
+                throw "Downloaded file failed SHA256 integrity verification. The file may be corrupt or interrupted."
+            }
+            Write-Host " VERIFIED [OK]" -ForegroundColor Green
+
+            $zipToExtract = $tempZip
+            $isTempZip = $true
         }
 
-        $fileStream.Flush()
-        $fileStream.Close()
-        $respStream.Close()
-        $resp.Close()
-        $sw.Stop()
-
-        Write-Host ""
-        Write-Host "  Download complete in $([math]::Round($sw.Elapsed.TotalSeconds, 1))s." -ForegroundColor Green
-
-        # Verify SHA256 Checksum
-        Write-Host "  Verifying package integrity (SHA256)..." -NoNewline -ForegroundColor Gray
-        $computedHash = (Get-FileHash -LiteralPath $tempZip -Algorithm SHA256).Hash.ToUpper()
-
-        if ($computedHash -ne $ExpectedHash.ToUpper()) {
-            Write-Host " MISMATCH!" -ForegroundColor Red
-            Write-Host "  Expected: $ExpectedHash" -ForegroundColor Red
-            Write-Host "  Received: $computedHash" -ForegroundColor Red
-            throw "Downloaded file failed SHA256 integrity verification. The file may be corrupt or interrupted."
-        }
-        Write-Host " VERIFIED [OK]" -ForegroundColor Green
-
-        # Extract directly into target folder
+        # Extract directly into target game folder
         Write-Host "  Extracting tile files into: $TargetSubDir..." -ForegroundColor Cyan
         Add-Type -AssemblyName System.IO.Compression.FileSystem
-        $zip = [System.IO.Compression.ZipFile]::OpenRead($tempZip)
+        $zip = [System.IO.Compression.ZipFile]::OpenRead($zipToExtract)
         $totalEntries = $zip.Entries.Count
         $entryIdx = 0
 
@@ -194,10 +279,12 @@ function Download-And-Install-Pack {
         }
         $zip.Dispose()
         Write-Host ""
-        Write-Host "  Extraction complete! ($totalEntries tiles installed)" -ForegroundColor Green
+        Write-Host "  Extraction complete! ($totalEntries tiles installed in game directory)" -ForegroundColor Green
 
-        # Remove temp zip
-        Remove-Item -Force -LiteralPath $tempZip -ErrorAction SilentlyContinue
+        # Remove temp zip if we downloaded it
+        if ($isTempZip -and (Test-Path -LiteralPath $tempZip)) {
+            Remove-Item -Force -LiteralPath $tempZip -ErrorAction SilentlyContinue
+        }
         return $true
     }
     catch {
@@ -213,27 +300,60 @@ function Download-And-Install-Pack {
 try {
     Write-Header
 
-    $tilesDir = Locate-TilesDirectory
+    $rawSrc = $env:SCRIPT_SOURCE
+    if (-not $rawSrc) { $rawSrc = [System.AppDomain]::CurrentDomain.BaseDirectory }
+    $sourceDir = (Resolve-Path $rawSrc).Path
+
+    # Locate the active Railroader game mods directory
+    $gameModDir = Locate-GameModDirectory
+    $tilesDir = Join-Path $gameModDir "Tiles"
+    New-Item -ItemType Directory -Force -Path $tilesDir | Out-Null
+
     $usgsDir = Join-Path $tilesDir "USGSTopo"
     $osmDir = Join-Path $tilesDir "OSM"
+    New-Item -ItemType Directory -Force -Path $usgsDir | Out-Null
+    New-Item -ItemType Directory -Force -Path $osmDir | Out-Null
+
+    # If running from a download/extracted folder outside the game directory:
+    # Check if that download folder already has tiles and sync them!
+    $isOutsideGameDir = ($sourceDir.TrimEnd('\') -ine $gameModDir.TrimEnd('\'))
+    if ($isOutsideGameDir) {
+        $srcTilesDir = Join-Path $sourceDir "Tiles"
+        if (Test-Path -LiteralPath $srcTilesDir) {
+            $syncedUsgs = Sync-TilesFromFolder -SourceFolder $srcTilesDir -TargetFolder $tilesDir -PackSubDir "USGSTopo"
+            $syncedOsm = Sync-TilesFromFolder -SourceFolder $srcTilesDir -TargetFolder $tilesDir -PackSubDir "OSM"
+            if ($syncedUsgs -gt 0 -or $syncedOsm -gt 0) {
+                Write-Host "  [OK] Successfully synced existing tiles from download folder into game directory!" -ForegroundColor Green
+                Write-Host ""
+            }
+        }
+    }
 
     while ($true) {
         $counts = Get-TileCounts -TilesDir $tilesDir
 
-        Write-Host "  Target Tiles Directory:" -ForegroundColor White
+        Write-Host "  Target Game Tiles Directory:" -ForegroundColor White
         Write-Host "    $tilesDir" -ForegroundColor Cyan
+        if ($isOutsideGameDir) {
+            Write-Host "  Running from Source/Download Folder:" -ForegroundColor Gray
+            Write-Host "    $sourceDir" -ForegroundColor Gray
+        }
         Write-Host ""
-        Write-Host "  Installed Tile Status:" -ForegroundColor White
+        Write-Host "  Installed Tile Status in Railroader:" -ForegroundColor White
         Write-Host "    1. USGS Topographic: " -NoNewline -ForegroundColor Gray
-        if ($counts.USGS -gt 0) {
-            Write-Host "$($counts.USGS.ToString('N0')) tiles installed [OK]" -ForegroundColor Green
+        if ($counts.USGS -ge $USGS_EXPECTED_TILES) {
+            Write-Host "$($counts.USGS.ToString('N0')) tiles installed [Complete OK]" -ForegroundColor Green
+        } elseif ($counts.USGS -gt 0) {
+            Write-Host "$($counts.USGS.ToString('N0')) tiles installed [Partial: $($counts.USGS)/$USGS_EXPECTED_TILES]" -ForegroundColor Yellow
         } else {
             Write-Host "Not installed" -ForegroundColor Yellow
         }
 
         Write-Host "    2. OpenStreetMap:    " -NoNewline -ForegroundColor Gray
-        if ($counts.OSM -gt 0) {
-            Write-Host "$($counts.OSM.ToString('N0')) tiles installed [OK]" -ForegroundColor Green
+        if ($counts.OSM -ge $OSM_EXPECTED_TILES) {
+            Write-Host "$($counts.OSM.ToString('N0')) tiles installed [Complete OK]" -ForegroundColor Green
+        } elseif ($counts.OSM -gt 0) {
+            Write-Host "$($counts.OSM.ToString('N0')) tiles installed [Partial: $($counts.OSM)/$OSM_EXPECTED_TILES]" -ForegroundColor Yellow
         } else {
             Write-Host "Not installed" -ForegroundColor Yellow
         }
@@ -241,13 +361,13 @@ try {
 
         Write-Host "======================================================================" -ForegroundColor Cyan
         Write-Host "  Select an option:" -ForegroundColor White
-        Write-Host "    [1] Download USGS Topo Pack (~$USGS_SIZE_MB, $USGS_EXPECTED_TILES tiles, Zooms 14-16)" -ForegroundColor White
+        Write-Host "    [1] Download / Update USGS Topo Pack (~$USGS_SIZE_MB, $USGS_EXPECTED_TILES tiles, Zooms 14-16)" -ForegroundColor White
         Write-Host "        Authentic Appalachian mountain contours, elevations, waterways." -ForegroundColor Gray
         Write-Host ""
-        Write-Host "    [2] Download OpenStreetMap Pack (~$OSM_SIZE_MB, $OSM_EXPECTED_TILES tiles, Zooms 12-17)" -ForegroundColor White
+        Write-Host "    [2] Download / Update OpenStreetMap Pack (~$OSM_SIZE_MB, $OSM_EXPECTED_TILES tiles, Zooms 12-17)" -ForegroundColor White
         Write-Host "        High-contrast GIS roads, rivers, street networks & rail yard sidings." -ForegroundColor Gray
         Write-Host ""
-        Write-Host "    [3] Download BOTH Packs (~650 MB Total)" -ForegroundColor White
+        Write-Host "    [3] Download / Update BOTH Packs (~650 MB Total)" -ForegroundColor White
         Write-Host "        Recommended for instant dual-provider toggling in the game." -ForegroundColor Gray
         Write-Host ""
         Write-Host "    [4] Verify Installed Tiles Integrity" -ForegroundColor White
@@ -257,7 +377,7 @@ try {
         $choice = Read-Host
 
         if ($choice -eq "1") {
-            $res = Download-And-Install-Pack -PackName "USGS Topographic Corridor Pack" -Url $USGS_URL -ExpectedHash $USGS_HASH -TargetSubDir $usgsDir -ExpectedTiles $USGS_EXPECTED_TILES
+            $res = Download-And-Install-Pack -PackName "USGS Topographic Corridor Pack" -Url $USGS_URL -ExpectedHash $USGS_HASH -TargetSubDir $usgsDir -ExpectedTiles $USGS_EXPECTED_TILES -SourceDir $sourceDir
             if ($res) {
                 Write-Host ""
                 Write-Host "  [TIP] In Railroader, press [Ctrl+M], set Map Background to 'Map Tiles'," -ForegroundColor Cyan
@@ -265,7 +385,7 @@ try {
             }
         }
         elseif ($choice -eq "2") {
-            $res = Download-And-Install-Pack -PackName "OpenStreetMap Corridor Pack" -Url $OSM_URL -ExpectedHash $OSM_HASH -TargetSubDir $osmDir -ExpectedTiles $OSM_EXPECTED_TILES
+            $res = Download-And-Install-Pack -PackName "OpenStreetMap Corridor Pack" -Url $OSM_URL -ExpectedHash $OSM_HASH -TargetSubDir $osmDir -ExpectedTiles $OSM_EXPECTED_TILES -SourceDir $sourceDir
             if ($res) {
                 Write-Host ""
                 Write-Host "  [TIP] In Railroader, press [Ctrl+M], set Map Background to 'Map Tiles'," -ForegroundColor Cyan
@@ -274,11 +394,11 @@ try {
         }
         elseif ($choice -eq "3") {
             Write-Host ""
-            Write-Host "  Starting download of BOTH offline packs..." -ForegroundColor Cyan
-            Download-And-Install-Pack -PackName "OpenStreetMap Corridor Pack" -Url $OSM_URL -ExpectedHash $OSM_HASH -TargetSubDir $osmDir -ExpectedTiles $OSM_EXPECTED_TILES
-            Download-And-Install-Pack -PackName "USGS Topographic Corridor Pack" -Url $USGS_URL -ExpectedHash $USGS_HASH -TargetSubDir $usgsDir -ExpectedTiles $USGS_EXPECTED_TILES
+            Write-Host "  Installing BOTH offline tile packs into game directory..." -ForegroundColor Cyan
+            Download-And-Install-Pack -PackName "OpenStreetMap Corridor Pack" -Url $OSM_URL -ExpectedHash $OSM_HASH -TargetSubDir $osmDir -ExpectedTiles $OSM_EXPECTED_TILES -SourceDir $sourceDir
+            Download-And-Install-Pack -PackName "USGS Topographic Corridor Pack" -Url $USGS_URL -ExpectedHash $USGS_HASH -TargetSubDir $usgsDir -ExpectedTiles $USGS_EXPECTED_TILES -SourceDir $sourceDir
             Write-Host ""
-            Write-Host "  [TIP] Both tile sets are installed! In Railroader, press [Ctrl+M]" -ForegroundColor Green
+            Write-Host "  [TIP] Both tile sets are installed in Railroader! Press [Ctrl+M]" -ForegroundColor Green
             Write-Host "        and toggle freely between 'USGSTopo' and 'OSM' anytime!" -ForegroundColor Green
         }
         elseif ($choice -eq "4") {
@@ -321,4 +441,3 @@ catch {
     Write-Host "  [FATAL ERROR] $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
-
