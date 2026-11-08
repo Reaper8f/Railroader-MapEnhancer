@@ -2,7 +2,7 @@
 
 This file is an initialization guide. You can delete it after setup.
 
-## 1. Create the GitHub repository
+## 1. Create the GitHub repository [x]
 
 Suggested repository name: `railroader-mapenhancer`
 
@@ -11,7 +11,7 @@ Suggested repository name: `railroader-mapenhancer`
 - Initialize with README: No (this template already contains one)
 - Add a license: No, until the maintainer has decided what terms apply to the contents of this hub.
 
-## 2. Initialize this directory
+## 2. Initialize this directory [x]
 
 Run these commands from the local `distribution` directory:
 
