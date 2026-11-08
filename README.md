@@ -11,9 +11,9 @@
 This repository is the **official public project hub** — home to releases, documentation, issue tracking, and roadmap planning.
 
 > **Official Website & Docs:** [mapenhancer.refizar.in](https://mapenhancer.refizar.in)  
-> **Interactive Topo Web Map:** [railroadermap.refizar.in](https://railroadermap.refizar.in/)  
+> **Interactive Web Map:** [railroadermap.refizar.in](https://railroadermap.refizar.in/)  
 > **Nexus Mods:** [Nexus Mods #18](https://www.nexusmods.com/railroader/mods/18)  
-> **Maintainer:** [Reaper8f](https://github.com/Reaper8f) | *Original Author:* Michael Richer (Vanguard)
+> **Maintainer:** [Reaper8f](https://github.com/Reaper8f) | *Original Author:* Michael Richer [(Vanguard)](https://github.com/mricher-git)
 
 ---
 
@@ -42,6 +42,7 @@ This repository is the **official public project hub** — home to releases, doc
 - **[Installation Guide](docs/installation.md)** — Step-by-step setup for Windows & Steam Deck / Linux Proton, safe updates, and tile pack installation.
 - **[Feature Catalog](docs/features.md)** — In-depth overview of all subsystems, map overlays, and operational tools.
 - **[Configuration Reference](docs/configuration.md)** — Complete breakdown of all 10 in-game settings tabs, sliders, toggles, and rebindable hotkeys.
+- **[Map Backgrounds & Slippy Tiles Guide](docs/MAP_BACKGROUND_AND_TILES.md)** — Comprehensive guide to offline tile streaming (USGS Topo & OSM), custom calibration, and downloader scripts.
 - **[Troubleshooting & Diagnostics](docs/troubleshooting.md)** — Log inspection (`Player.log`), common error fixes, and conflict resolution.
 - **[Frequently Asked Questions (FAQ)](docs/faq.md)** — Answers to common community questions.
 - **[Changelog](CHANGELOG.md)** — Detailed version history and release notes.
