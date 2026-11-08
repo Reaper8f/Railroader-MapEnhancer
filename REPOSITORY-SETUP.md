@@ -28,13 +28,13 @@ If the GitHub repository name or owner differs, update the remote URL.
 
 ## 3. Configure GitHub
 
-- Enable Issues.
-- Enable Discussions and create categories such as Announcements, General, Ideas, and Q&A.
-- Create a GitHub Project using `project-management/PROJECT_BOARD.md`.
-- Add labels from `project-management/LABELS.md`.
-- Enable private vulnerability reporting if available.
-- Add the official website URL to the repository About section and README.
-- Add release assets through GitHub Releases.
+- [x] Enable Issues.
+- [x] Enable Discussions (categories: Announcements, General, Ideas, and Q&A).
+- [ ] Create a GitHub Project using `project-management/PROJECT_BOARD.md` (via [GitHub Projects](https://github.com/users/Reaper8f/projects/new) or `gh auth refresh -s project`).
+- [x] Add labels from `project-management/LABELS.md` (`bug`, `feature-request`, `compatibility`, `needs-triage`, etc.).
+- [ ] Enable private vulnerability reporting in repository Settings > Security (optional).
+- [x] Add the official website URL (`https://mapenhancer.refizar.in`) and description to the repository About section.
+- [x] Add release assets through GitHub Releases (`v2.0.16` mod package and `map-tiles-v1` offline tile packs).
 
 ## 4. Keep the parent repository separate
 
