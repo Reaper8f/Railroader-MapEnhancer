@@ -67,3 +67,4 @@ Every Map Enhancer release bundle includes **`downloadtiles.bat`**:
 4. In Section 1, set **Map Background Mode** to **`Map Tiles (Local Tile Packs)`**.
 5. Choose **`USGSTopo`** or **`OSM`** in the **Tile Set** dropdown.
 6. Adjust the **Background Opacity** slider ($40\%–60\%$ recommended).
+
