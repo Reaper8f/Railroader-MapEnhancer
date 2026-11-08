@@ -9,7 +9,12 @@ set "EXIT_CODE=%ERRORLEVEL%"
 if %EXIT_CODE% NEQ 0 (
     echo.
     echo ======================================================================
-    echo  Installation failed or was cancelled (Exit code: %EXIT_CODE%).
+    echo  Installation failed or was cancelled [Exit code: %EXIT_CODE%].
+    echo ======================================================================
+) else (
+    echo.
+    echo ======================================================================
+    echo  Installation Finished Successfully!
     echo ======================================================================
 )
 echo.
@@ -487,6 +492,8 @@ try {
         Write-Host "    2. Press [M] to open the map (Railroader default)." -ForegroundColor Gray
         Write-Host "    3. Press [Ctrl+M] or click [ME] in top-right to open settings." -ForegroundColor Gray
         Write-Host "    4. Press [Z] to maximize or toggle large floating map view." -ForegroundColor Gray
+        Write-Host ""
+        Write-Host "  [OK] Installation finished! Map Enhancer is ready to use." -ForegroundColor Green
         Write-Host ""
     }
 
