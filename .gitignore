@@ -1,0 +1,32 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local notes and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+private/
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+*.swp
+
+# Build outputs and large distributables
+bin/
+obj/
+dist/
+artifacts/
+*.dll
+*.exe
+*.pdb
+*.zip
+*.7z
+*.rar
