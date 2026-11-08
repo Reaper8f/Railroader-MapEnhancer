@@ -58,7 +58,7 @@ Download compiled mod releases and optional tile packs directly from the **[GitH
 |---|---|---|
 | **`reaper-mapenhancer-2.0.16.zip`** *(Complete Edition)* | Full mod binaries (`MapEnhancer.dll`), Harmony, UI assets, `install.bat`, and `downloadtiles.bat` | ~1.8 MB |
 | **`reaper-mapenhancer-2.0.16-nexus.zip`** *(Nexus Mods Edition)* | Clean mod binaries, Harmony, UI assets, and guides (zero `.bat` scripts for instant security clearance) | ~1.8 MB |
-| **`MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip`** | 100% offline USGS Topographical corridor tiles (Zoom 14–16) | 574 MB |
+| **`MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip`** | 100% offline USGS Topographical corridor tiles (Zoom 12–16) | 692 MB |
 | **`MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip`** | 100% offline OpenStreetMap corridor tiles (Zoom 12–17) | 76.5 MB |
 
 > **Automated Setup Scripts:** The Complete Edition zip bundle includes `install.bat` (automated mod installer and updater preserving user settings) and `downloadtiles.bat` (automated tile pack downloader and extractor). The Nexus Mods Edition provides the clean binaries without batch scripts.

@@ -28,9 +28,9 @@ $ErrorActionPreference = "Stop"
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12 -bor [System.Net.SecurityProtocolType]::Tls13
 
 $USGS_URL = "https://github.com/Reaper8f/Railroader-MapEnhancer/releases/download/map-tiles-v1/MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip"
-$USGS_HASH = "F6B4499A2D4F301BAFD108525415E53B6026396DC5B2DC3252D334864D31BE99"
-$USGS_EXPECTED_TILES = 5101
-$USGS_SIZE_MB = "574 MB"
+$USGS_HASH = "0539BEFAA157DB5CCAB136FCA0B485EEAD6F0BEED6457AA53EF973F49CFD53F8"
+$USGS_EXPECTED_TILES = 6040
+$USGS_SIZE_MB = "692 MB"
 
 $OSM_URL = "https://github.com/Reaper8f/Railroader-MapEnhancer/releases/download/map-tiles-v1/MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip"
 $OSM_HASH = "40587516F526027644A593829D23F590A20DFC00280204137C0B72B03322AE5E"
@@ -361,13 +361,13 @@ try {
 
         Write-Host "======================================================================" -ForegroundColor Cyan
         Write-Host "  Select an option:" -ForegroundColor White
-        Write-Host "    [1] Download / Update USGS Topo Pack (~$USGS_SIZE_MB, $USGS_EXPECTED_TILES tiles, Zooms 14-16)" -ForegroundColor White
+        Write-Host "    [1] Download / Update USGS Topo Pack (~$USGS_SIZE_MB, $USGS_EXPECTED_TILES tiles, Zooms 12-16)" -ForegroundColor White
         Write-Host "        Authentic Appalachian mountain contours, elevations, waterways." -ForegroundColor Gray
         Write-Host ""
         Write-Host "    [2] Download / Update OpenStreetMap Pack (~$OSM_SIZE_MB, $OSM_EXPECTED_TILES tiles, Zooms 12-17)" -ForegroundColor White
         Write-Host "        High-contrast GIS roads, rivers, street networks & rail yard sidings." -ForegroundColor Gray
         Write-Host ""
-        Write-Host "    [3] Download / Update BOTH Packs (~650 MB Total)" -ForegroundColor White
+        Write-Host "    [3] Download / Update BOTH Packs (~768 MB Total)" -ForegroundColor White
         Write-Host "        Recommended for instant dual-provider toggling in the game." -ForegroundColor Gray
         Write-Host ""
         Write-Host "    [4] Verify Installed Tiles Integrity" -ForegroundColor White

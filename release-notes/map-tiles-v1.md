@@ -10,7 +10,7 @@
 
 - **Map Enhancer:** Version **2.0.16 or higher**
 - **Railroader:** Version **0.6.0+ Experimental** (native C# mod loader)
-- **Disk Space:** ~574 MB for USGS Topo, ~76.5 MB for OpenStreetMap (~650 MB for both)
+- **Disk Space:** ~692 MB for USGS Topo, ~76.5 MB for OpenStreetMap (~768 MB for both)
 
 ---
 
@@ -18,7 +18,7 @@
 
 | Package | Filename | Size | Zoom Range | Tile Count | SHA256 Checksum |
 | :--- | :--- | :---: | :---: | :---: | :--- |
-| **USGS Topo** | `MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip` | 574 MB | Zooms 14–16 | 5,101 | `F6B4499A2D4F301BAFD108525415E53B6026396DC5B2DC3252D334864D31BE99` |
+| **USGS Topo** | `MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip` | 692 MB | Zooms 12–16 | 6,040 | `0539BEFAA157DB5CCAB136FCA0B485EEAD6F0BEED6457AA53EF973F49CFD53F8` |
 | **OpenStreetMap** | `MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip` | 76.5 MB | Zooms 12–17 | 23,315 | `40587516F526027644A593829D23F590A20DFC00280204137C0B72B03322AE5E` |
 
 ---
@@ -32,7 +32,7 @@ Every Map Enhancer release bundle includes **`downloadtiles.bat`**:
 1. Ensure **Railroader is closed**.
 2. Run **`downloadtiles.bat`** (located inside your mod folder or extracted release zip).
 3. Select an option from the menu:
-   - `[1]` **Download USGS Topographic Corridor Pack** (574 MB)
+   - `[1]` **Download USGS Topographic Corridor Pack** (692 MB)
    - `[2]` **Download OpenStreetMap Corridor Pack** (76.5 MB)
    - `[3]` **Download Both Packs** (~650 MB Total — Recommended)
 4. The script will automatically download the archives directly from this release, verify their SHA256 cryptographic hashes for corruption-free integrity, and extract all tiles into the appropriate subfolders.
@@ -55,7 +55,7 @@ Every Map Enhancer release bundle includes **`downloadtiles.bat`**:
    ```bash
    ~/.steam/steam/steamapps/compatdata/1683150/pfx/drive_c/users/steamuser/Documents/Railroader/Mods/reaper-map-enhancer/Tiles/
    ```
-4. Confirm folder structure: inside `Tiles\USGSTopo\`, you should see zoom level folders (e.g., `14\`, `15\`, `16\`). Inside `Tiles\OSM\`, you should see zoom folders (e.g., `12\` through `17\`).
+4. Confirm folder structure: inside `Tiles\USGSTopo\`, you should see zoom level folders (e.g., `12\`, `13\`, `14\`, `15\`, `16\`) or flat `.tile` files. Inside `Tiles\OSM\`, you should see zoom folders (e.g., `12\` through `17\`).
 
 ---
 

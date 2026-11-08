@@ -50,7 +50,7 @@ Map Enhancer provides three distinct background rendering modes:
    - **Map Background Mode:** Select `Disabled (Default Map)`, `Custom Image`, or `Map Tiles (Local Tile Packs)`.
    - **When Map Tiles is Selected:**
      - **Tile Set Selector:** Choose which tile pack to stream (`USGSTopo`, `OSM`, or any custom folder placed in `Tiles/`).
-     - **Provider Info:** Displays total tiles found on disk, supported zoom ranges (e.g. Zooms 14–16 for USGS, Zooms 12–17 for OSM), and status.
+     - **Provider Info:** Displays total tiles found on disk, supported zoom ranges (e.g. Zooms 12–16 for USGS, Zooms 12–17 for OSM), and status.
      - **Rescan & Reload Tiles Button:** Triggers an asynchronous background disk scan and refreshes the tile grid without interrupting gameplay.
      - **Trim Map to Corridor:** When checked, restricts tile streaming strictly to the active track corridor polygon, saving VRAM.
      - **Corridor Margin:** Configures the spatial buffer around track centerlines ($500\text{m}–10,000\text{m}$, default: $2500\text{m}$).
@@ -193,7 +193,7 @@ Two pre-packaged offline tile sets covering the entire Railroader corridor from 
 
 | Package | File | Size | Zooms | Tiles | Description | SHA256 Checksum |
 | :--- | :--- | :---: | :---: | :---: | :--- | :--- |
-| **USGS Topo** | `MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip` | 574 MB | 14–16 | 5,101 | Authentic Appalachian mountain topography, elevation contours, hydrology, and historical railroad alignments from USGS The National Map (100% US Government Public Domain). | `F6B4499A2D4F301BAFD108525415E53B6026396DC5B2DC3252D334864D31BE99` |
+| **USGS Topo** | `MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip` | 692 MB | 12–16 | 6,040 | Authentic Appalachian mountain topography, elevation contours, hydrology, and historical railroad alignments from USGS The National Map (100% US Government Public Domain). | `0539BEFAA157DB5CCAB136FCA0B485EEAD6F0BEED6457AA53EF973F49CFD53F8` |
 | **OpenStreetMap** | `MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip` | 76.5 MB | 12–17 | 23,315 | High-contrast GIS street, river, highway, and yard cartography with razor-sharp switching detail (~0.97 m/px). | `40587516F526027644A593829D23F590A20DFC00280204137C0B72B03322AE5E` |
 
 ---
@@ -205,9 +205,9 @@ Every Map Enhancer release ZIP includes **`downloadtiles.bat`**:
 1. Close Railroader.
 2. Double-click **`downloadtiles.bat`** (located in your mod folder or extracted release ZIP).
 3. Select an option from the menu:
-   - `[1]` **Download USGS Topographic Corridor Pack** (574 MB)
+   - `[1]` **Download USGS Topographic Corridor Pack** (692 MB)
    - `[2]` **Download OpenStreetMap Corridor Pack** (76.5 MB)
-   - `[3]` **Download Both Packs** (~650 MB Total — Recommended)
+   - `[3]` **Download Both Packs** (~768 MB Total — Recommended)
 4. The script automatically downloads the packages from GitHub Releases, validates the cryptographic **SHA256 checksum**, and extracts the tiles into `Tiles\USGSTopo\` and `Tiles\OSM\`.
 
 ---
@@ -222,7 +222,7 @@ If downloading manually from the [GitHub Releases page](../../releases):
    Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\
    Documents\Railroader\Mods\reaper-map-enhancer\Tiles\OSM\
    ```
-3. Inside `Tiles\USGSTopo\`, you should see zoom subfolders (e.g. `14\`, `15\`, `16\`).
+3. Inside `Tiles\USGSTopo\`, you should see zoom subfolders (e.g. `12\`, `13\`, `14\`, `15\`, `16\`) or flat tile files.
 4. In Railroader, press **`M`** to open the map, press **`Ctrl+M`** to open Settings, set **Map Background** to **`Map Tiles`**, and select your tile set.
 
 ---

@@ -117,9 +117,9 @@ Map Enhancer supports 100% offline local map tile streaming with zero internet r
 
 1. Inside your mod folder or extracted zip, run **`downloadtiles.bat`**.
 2. Select an option:
-   - `[1]` **USGS Topographic Corridor Pack** (~574 MB, 5,101 tiles, Zooms 14–16)
+   - `[1]` **USGS Topographic Corridor Pack** (~692 MB, 6,040 tiles, Zooms 12–16)
    - `[2]` **OpenStreetMap Corridor Pack** (~76.5 MB, 23,315 tiles, Zooms 12–17)
-   - `[3]` **Both Packs** (~650 MB Total — Recommended)
+   - `[3]` **Both Packs** (~768 MB Total — Recommended)
 3. The script downloads the packs, validates cryptographic SHA256 checksums, and extracts tiles directly into `Tiles\USGSTopo\` and `Tiles\OSM\`.
 
 ### Option B: Manual Tile Download (Nexus Mods & Direct Downloaders)
@@ -127,7 +127,7 @@ Download tile archives from [GitHub Releases](../../releases) or the [Website](h
 
 - **USGS Topo Archive (`MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip`):**  
   Extract into: `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\`  
-  *(SHA256: `F6B4499A2D4F301BAFD108525415E53B6026396DC5B2DC3252D334864D31BE99`)*
+  *(SHA256: `0539BEFAA157DB5CCAB136FCA0B485EEAD6F0BEED6457AA53EF973F49CFD53F8`)*
 
 - **OpenStreetMap Archive (`MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip`):**  
   Extract into: `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\OSM\`  
