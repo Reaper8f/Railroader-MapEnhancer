@@ -1,0 +1,38 @@
+name: Compatibility report
+description: Report compatibility with a Railroader version, dependency, or another mod.
+title: "[Compatibility]: "
+labels: ["compatibility", "needs-triage"]
+body:
+  - type: input
+    id: map_enhancer
+    attributes:
+      label: Map Enhancer version
+    validations:
+      required: true
+  - type: input
+    id: railroader
+    attributes:
+      label: Railroader version and branch
+    validations:
+      required: true
+  - type: input
+    id: other_mod
+    attributes:
+      label: Other mod or dependency
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Compatibility result
+      description: What works, what fails, and how to reproduce it.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Redact personal information and secrets.
+      render: text
+    validations:
+      required: false

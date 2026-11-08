@@ -1,0 +1,12 @@
+title: General discussion
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this category for general Map Enhancer discussion. For reproducible defects, open a bug report instead.
+  - type: textarea
+    id: topic
+    attributes:
+      label: What's on your mind?
+    validations:
+      required: true

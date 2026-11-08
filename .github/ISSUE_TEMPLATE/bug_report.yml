@@ -1,0 +1,68 @@
+name: Bug report
+description: Report a reproducible problem with Map Enhancer.
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search existing issues first. Do not include credentials, personal information, or unredacted logs.
+  - type: input
+    id: mod_version
+    attributes:
+      label: Map Enhancer version
+      placeholder: e.g. 2.0.x
+    validations:
+      required: true
+  - type: input
+    id: game_version
+    attributes:
+      label: Railroader version
+      placeholder: Include stable/experimental branch if relevant
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Relevant environment
+      description: Mod loader/framework version and other relevant mods.
+    validations:
+      required: false
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: Numbered, reproducible steps.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log excerpts
+      description: Redact usernames, tokens, identifiers, and unrelated private information. Avoid uploading complete logs unless requested.
+      render: text
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: I verified that my versions are supported by the release notes.
+          required: true
+        - label: I removed sensitive information from logs and screenshots.
+          required: true

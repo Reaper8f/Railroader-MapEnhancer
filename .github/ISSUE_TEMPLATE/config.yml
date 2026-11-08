@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and community discussion
+    url: https://github.com/Reaper8f/railroader-mapenhancer/discussions
+    about: Ask questions and discuss Map Enhancer with the community.
+  - name: Download the latest release
+    url: https://github.com/Reaper8f/railroader-mapenhancer/releases
+    about: Download packages and read version-specific release notes.
