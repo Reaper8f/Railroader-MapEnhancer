@@ -25,12 +25,12 @@ exit /b %EXIT_CODE%
 $ErrorActionPreference = "Stop"
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12 -bor [System.Net.SecurityProtocolType]::Tls13
 
-$USGS_URL = "https://github.com/Reaper8f/railroader-mapenhancer2.0/releases/download/v2.0.16/MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip"
+$USGS_URL = "https://github.com/Reaper8f/Railroader-MapEnhancer/releases/download/map-tiles-v1/MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip"
 $USGS_HASH = "F6B4499A2D4F301BAFD108525415E53B6026396DC5B2DC3252D334864D31BE99"
 $USGS_EXPECTED_TILES = 5101
 $USGS_SIZE_MB = "574 MB"
 
-$OSM_URL = "https://github.com/Reaper8f/railroader-mapenhancer2.0/releases/download/v2.0.16/MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip"
+$OSM_URL = "https://github.com/Reaper8f/Railroader-MapEnhancer/releases/download/map-tiles-v1/MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip"
 $OSM_HASH = "40587516F526027644A593829D23F590A20DFC00280204137C0B72B03322AE5E"
 $OSM_EXPECTED_TILES = 23315
 $OSM_SIZE_MB = "76.5 MB"
