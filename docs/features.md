@@ -23,7 +23,7 @@ To clearly identify the historical origins and evolution of each capability acro
 
 - **Inherited `[Vanguard]`** — Originated in the original Vanguard Map Enhancer mod (v1.0.0 – v1.4.0).
 - **Fork Enhancement `[Reaper8f Fork]`** — Added or improved in the Reaper8f community fork (v1.5.0 – v1.5.6).
-- **ME2.0 New / Overhaul `[ME2.0]`** — Reimplemented, modernized, or introduced specifically for Railroader 0.6+ native modding (v2.0.0 – v2.0.16).
+- **ME2.0 New / Overhaul `[ME2.0]`** — Reimplemented, modernized, or introduced specifically for Railroader 0.6+ native modding (v2.0.0 – v2.0.17).
 - **Status Indicators:**
   - ✅ **Active** — Fully implemented, ported, and verified in current Railroader 0.6+ builds.
   - 🧪 **Experimental** — Active in code and functional, undergoing community feedback.
@@ -80,17 +80,19 @@ Dispatch trains, spot railcars, and manage movements directly from your dispatch
   <br><em>Click on any track to dispatch your engineer to that location.</em>
 </p>
 
-### 1.2 Click-to-Couple Consist Automation `[ME2.0 v2.0.15]`
+### 1.2 Intelligent Click-to-Couple Consist Automation `[ME2.0 v2.0.17]`
 
 - **How to Use:** Hold `CapsLock` and left-click on any stationary railcar or consist on the map.
-- **Smart End Selection:** The system checks which end of the target consist is accessible from your locomotive's direction and automatically routes to the open coupler, avoiding dead-end traps.
-- **Soft Joint & Coupling:** AutoEngineer drives up, slows down for a gentle joint, and couples automatically.
+- **Coupling-Point Awareness & Occupancy Checks:** Inspects both couplers (`End A` and `End B`) of the target car and never routes into an already occupied coupling point.
+- **Dynamic Route Planning & Run-Arounds:** Evaluates actual track distance and switch connectivity. If the direct facing end is blocked by another coupled car, the planner automatically routes the locomotive past the target through available switches/turnouts to reverse and approach the open coupling end.
+- **Soft Joint & Coupling:** AutoEngineer drives smoothly along the calculated approach, stops at safe coupling distance, and couples automatically.
 
-### 1.3 Live Route Preview & Target HUD `[ME2.0 v2.0.15]`
+### 1.3 Live Route Preview, Toggle Keybind & Target HUD `[ME2.0 v2.0.17]`
 
-- **Route Line:** While holding the dispatch key, an animated route preview line traces the path between your locomotive and the cursor.
+- **Route Line:** While holding the dispatch key (or toggled active), an animated route preview ribbon traces the real-time path between your locomotive and the cursor.
+- **Configurable Route Preview Keybind:** Includes a dedicated settings toggle and customizable shortcut key (`routePreviewToggle`) to turn route previews on/off anytime.
 - **Target Info:** A floating cursor readout displays target distance, destination track ID, and car reporting marks.
-- **Obstruction Warnings:** The route preview pulses red if a track is blocked by other cars, a switch is locked against the path, or the destination cannot be reached.
+- **Obstruction Warnings:** The route preview pulses red if a track is blocked by other cars, a switch is locked against the path, or no open coupling point can be reached.
 
 ### 1.4 Instant Order Cancellation `[ME2.0 v2.0.15]`
 
@@ -298,17 +300,19 @@ Visualizes hill climbs and descending slopes across the mountains:
   - **Class 4 (60 mph):** Cyan
   - **Class 5 (80 mph):** Blue
 
-### 4.6 Mode 5: Track Condition Heatmap (Tie & Rail Wear) `[ME2.0 v2.0.12]`
+### 4.6 Mode 5: Track Condition Heatmap & Metric Parity `[ME2.0 v2.0.17]`
 
-- Highlights physical rail and tie wear across your network from Red (worn out) to Blue (pristine), helping you schedule Maintenance of Way work before slow orders occur.
+- Highlights rail and tie wear across your network from Red (worn out) to Blue (pristine), helping you schedule Maintenance of Way work before slow orders occur.
+- **Selectable Condition Overlay Metric:** Choose between **Per-Class Target (Relative)** (comparing physical wear against the track segment's FRA class threshold) and **Overall Physical (0–100%)**, matching hover percentages without confusion.
 
 ### 4.7 Mode 6: Track Cleanliness Heatmap (Brush & Vegetation) `[ME2.0 v2.0.12]`
 
 - Shows vegetation clearance along your right-of-way, identifying overgrown lines that need brush-cutter attention.
 
-### 4.8 Dynamic On-Screen Overlay Legend `[Reaper8f Fork v1.5.5 / ME2.0 v2.0.12]`
+### 4.8 Dynamic On-Screen Overlay Legend & Track Hover Metrics `[ME2.0 v2.0.17]`
 
-- A floating on-screen legend panel that automatically updates its color swatches and text to match whichever overlay mode is currently active. Positioned cleanly to clear the top toolbar ($Y = 44\text{px}$).
+- A floating on-screen legend panel that automatically updates its color swatches and labels (including Condition Overlay Metric percentages) to match whichever overlay mode is currently active. Positioned cleanly to clear the top toolbar ($Y = 44\text{px}$).
+- **Toggleable Track Hover Readouts:** Optional hover details for **Track Class, Condition & Speed**, **Track Condition & Weed Growth**, and selectable **Hover Track Metric Display** (`Per-Class Target`, `Overall Physical`, or `Both`).
 
 ---
 
@@ -458,6 +462,19 @@ Hovering directly over an individual car displays:
 - **Independent Settings:**
   - `HighlightSelectedCar`: Toggles map selection highlights for revenue rolling stock (freight cars, passenger cars, cabooses).
   - `HighlightSelectedLocomotive`: Toggles map selection highlights for locomotives and attached tenders.
+
+### 6.8 3 Hover HUD Display Modes & Dedicated Inspection HUD `[ME2.0 v2.0.17]`
+
+Choose how hover telemetry is displayed across the map under **Train & Cargo Telemetry → Hover HUD Display Mode**:
+
+1. **Attached to Map:** Compact tooltip anchored in the upper corner of the map window.
+2. **Hover Window:** Floating tooltip dynamically following the cursor as you inspect tracks or rolling stock.
+3. **Hover Pinned Window (Dedicated Inspection HUD):**
+   - Detached, resizable, movable native Railroader window (`WindowManager`) that automatically remembers its last position and dimensions.
+   - Retains the `[Last Inspected]` readout until you hover another item so you can read full manifests and waybills comfortably.
+   - **Dynamic Toolbar Button & `Ctrl+H` Keybind:** The compact `HUD` button appears on the map toolbar only when Hover Pinned mode is selected; toggle the Inspection HUD open or closed anytime via the `HUD` button or `Ctrl+H` (rebindable).
+   - **Unified Locomotive + Tender + Consist Layout:** Hovering either a locomotive or its coupled tender shows combined engine telemetry (crew, mode, speed, coal/water/diesel, handbrakes, journal oil, hotboxes) **alongside** consist metrics, passenger destinations, freight manifest, and alerts.
+   - **Tailored Cards by Entity Type:** Distinct structured layouts for Individual Freight Cars, Track Segments (grade, length, FRA class, safe speed, wear, weeds), Station Agents, and Player Signs.
 
 ---
 
@@ -762,7 +779,7 @@ Easily configure every feature to match your personal playstyle.
   - Switch throat dimming and unreachable track colors.
   - One-click reset buttons to restore default colors for any section.
 
-### 13.3 Integrated Keybinding Manager `[ME2.0 v2.0.14/16]`
+### 13.3 Integrated Keybinding Manager `[ME2.0 v2.0.17]`
 
 - Rebind any shortcut directly in-game:
   - Map Toggle (Default: `M`)
@@ -775,6 +792,8 @@ Easily configure every feature to match your personal playstyle.
   - Re-center on Player (Default: `Ctrl + Z`)
   - Follow Mode (Default: `Shift + Z`)
   - Settings Toggle (Default: `Ctrl + M`)
+  - Inspection HUD Toggle (Default: `Ctrl + H`)
+  - Live Route Preview Toggle (Configurable shortcut, no default)
   - Waypoint Dispatch Key (Default: `CapsLock`) + Left-click on Track/Car to set waypoint/couple, Right-Click to cancel
 
 ### 13.4 Comprehensive Settings Directory
@@ -785,6 +804,8 @@ Easily configure every feature to match your personal playstyle.
 |                           | `mapFollow`                         | `Shift + Z`     | Locks camera onto selected locomotive.              |
 |                           | `mapRecenter`                       | `Ctrl + Z`      | Centers camera on player position.                  |
 |                           | `mapSettingsToggle`                 | `Ctrl + M`      | Toggles Map Enhancer settings UI.                   |
+|                           | `hudToggle`                         | `Ctrl + H`      | Shows or hides the dedicated Inspection HUD window. |
+|                           | `routePreviewToggle`                | `None`          | Configurable shortcut to toggle route preview ribbon.|
 |                           | `LocomotiveDispatchKey`             | `CapsLock`      | Precision targeting dispatch key.                   |
 | **Waypoint Dispatch**     | `EnableLocomotiveDispatch`          | `true`          | Enables interactive click-to-dispatch.              |
 |                           | `ShowRoutePreview`                  | `true`          | Traces route line from train to target cursor.      |
@@ -793,8 +814,14 @@ Easily configure every feature to match your personal playstyle.
 |                           | `ContextMenuEnableConsistBrakes`    | `true`          | Shows consist brake commands.                       |
 |                           | `ContextMenuEnableConsistAir`       | `true`          | Shows air and steam connect/disconnect.             |
 |                           | `ContextMenuSmartHandbrakesDefault` | `true`          | Uses grade calculation for handbrakes.              |
-| **Map Backgrounds**       | `BackgroundMode`                    | `Disabled`      | Selects Disabled, Custom Image, USGS Topo, OSM.     |
+| **Map Backgrounds**       | `BackgroundMode`                    | `Disabled`      | Selects Disabled, Custom Image, or Map Tiles.       |
+|                           | `MapTileFolder`                     | `USGSTopo`      | Chooses `USGSTopo`, `USGSImageryTopo`, `OSM`, custom.|
 |                           | `MapBackgroundOpacity`              | `0.40` ($40\%$) | Background opacity ($0.0 – 1.0$).                   |
+| **Hover HUD & Track Metrics** | `HoverHud`                      | `AttachedToMap` | HUD Mode: `AttachedToMap`, `HoverWindow`, `HoverPinned`.|
+|                           | `ShowTrackClassConditionSpeed`      | `false`         | Adds FRA track class & effective speed on hover.    |
+|                           | `ShowTrackConditionWeeds`           | `false`         | Adds track condition & weed growth on hover.        |
+|                           | `TrackConditionDisplay`             | `PerClass`      | Hover metric: Per-Class Target, Overall, or Both.   |
+|                           | `TrackConditionOverlayMetric`       | `PerClass`      | Condition overlay mode metric (syncs legend).       |
 | **Track Rendering**       | `TrackLineThickness`                | `2.0`           | Track line rendering width ($0.5 – 3.0$).           |
 |                           | `EnableIndustryAreaColors`          | `true`          | Tints industry tracks by area colors.               |
 |                           | `ShowMoWYardTracks`                 | `true`          | Highlights MOW tracks with distinct color.          |
@@ -847,7 +874,7 @@ Robust diagnostic and auditing tools for single-player troubleshooting and multi
 
 ## 15. Master Feature Matrix & Lineage Comparison
 
-| Feature / Subsystem                             | Lineage Origin | Historical Milestones                                          | Current ME2.0 (v2.0.16) Status |
+| Feature / Subsystem                             | Lineage Origin | Historical Milestones                                          | Current ME2.0 (v2.0.17) Status |
 | :---------------------------------------------- | :------------: | :------------------------------------------------------------- | :----------------------------: |
 | **Track Color Coding (Main/Branch/Ind)**        | Vanguard v1.x  | `v1.0.0` (base), `v1.5.3.7` (area), `v2.0.12` (overhaul)       |           ✅ Active            |
 | **Visual-Only Track Colors (No Game Mutation)** |  Fork v1.5.x   | `v1.5.3.6` (visual isolation), `v2.0.0` (native shader)        |           ✅ Active            |
@@ -908,7 +935,7 @@ Robust diagnostic and auditing tools for single-player troubleshooting and multi
 | **Tooltip Sizing & Scale Controls**             |   ME2.0 New    | `v2.0.15` (in-game font scale and width controls)              |           ✅ Active            |
 | **Map Backgrounds (4 Modes)**                   |   ME2.0 New    | `v2.0.16` (Disabled, Custom Image, USGS Topo, OSM)             |           ✅ Active            |
 | **Dynamic Map Tile Streaming**                  |   ME2.0 New    | `v2.0.16` (dynamic zoom ladder Zooms 13–17)                    |           ✅ Active            |
-| **Pre-Packaged Offline Topo Pack**              |   ME2.0 New    | `v2.0.16` (Andrews–Sylva pack Zooms 12–15)                     |           ✅ Active            |
+| **Pre-Packaged Offline Topo Pack**              |   ME2.0 New    | `v2.0.16` (Andrews–Sylva pack Zooms 12–16, 6,040 tiles)        |           ✅ Active            |
 | **Custom Image Background Support**             |   ME2.0 New    | `v2.0.16` (auto-fit bounding box or JSON calibration)          |           ✅ Active            |
 | **Physical Safe Speed Curve Overlay**           |   ME2.0 New    | `v2.0.16` (curvature physics safe speed, 6 bands)              |           ✅ Active            |
 | **Passing Siding Accuracy Fix**                 |   ME2.0 New    | `v2.0.16` (siding tracks stay blue along entire span)          |           ✅ Active            |
@@ -922,6 +949,10 @@ Robust diagnostic and auditing tools for single-player troubleshooting and multi
 | **Consist Car Shingling & Depth Filing**        |   ME2.0 New    | `v2.0.16` (topological depth layering over neighbor tails)     |           ✅ Active            |
 | **Alternating Consist Colors**                  |   ME2.0 New    | `v2.0.16` (zebra shading toggle for same-destination cars)     |           ✅ Active            |
 | **Selected Car & Locomotive Map Highlighting**  |   ME2.0 New    | `v2.0.16` (pulsing golden halo for selected cars & engines)    |           ✅ Active            |
+| **USGS Satellite & Topo Pack (`USGSImageryTopo`)** | ME2.0 New   | `v2.0.17` (3rd pack: NAIP aerial imagery + contours & labels)  |           ✅ Active            |
+| **3 Hover HUD Modes & Inspection HUD (`Ctrl+H`)**  | ME2.0 New   | `v2.0.17` (Attached, Cursor, Resizable Pinned HUD + Loco+Consist)|         ✅ Active            |
+| **Intelligent Coupling-Point Dispatch**         |   ME2.0 New    | `v2.0.17` (open coupler check & run-around route planning)     |           ✅ Active            |
+| **Track Condition Metric & Hover Details**      |   ME2.0 New    | `v2.0.17` (Class, Condition, Speed, Weeds & Per-Class sync)    |           ✅ Active            |
 
 ---
 
@@ -960,6 +991,7 @@ Robust diagnostic and auditing tools for single-player troubleshooting and multi
 - **v2.0.14** — Full in-game keybinding manager for remapping shortcuts without editing JSON files.
 - **v2.0.15** — Interactive click-to-dispatch waypoints (`CapsLock`), click-to-couple consist automation, live route preview tracing, right-click car context menu, smart handbrakes engine, track and yard sign placement.
 - **v2.0.16** — Topographic map backgrounds (USGS Topo, OpenStreetMap live slippy tiles, custom images), physical safe speed curvature overlay, CTC passing siding BFS propagation fix, sub-segment industry delivery slicing, upright sign text fix, settings & tile asset preservation during updates, car marker length and width trimming sliders, consist car depth filing/shingling, alternating consist colors (zebra contrast with in-game toggle), and selected car/locomotive map outline highlighting (animated golden pulse halo, combined steam engine + tender support, and vertical depth boost).
+- **v2.0.17** — Added 3rd offline corridor tile pack (**USGS Satellite & Topo / `USGSImageryTopo`** with USDA NAIP aerials + contours & place labels, 926 MB), 3 selectable **Hover HUD Display Modes** including a detached, resizable **Inspection HUD window** (`Ctrl+H` toggle hotkey & conditional map `HUD` button), reorganized entity views unifying locomotive + tender + consist telemetry, **Intelligent Coupling-Point Dispatch** with occupied-end run-around route planning, **Live Route Preview** keybind, toggleable Track Class/Condition/Speed & Weed Growth hover details paired with **Per-Class vs Overall Condition** metric alignment, Linux/Proton archive path normalization, and updated installers/documentation.
 
 ---
 
@@ -969,7 +1001,7 @@ Robust diagnostic and auditing tools for single-player troubleshooting and multi
 - **Reaper8f** — Lead developer of Map Enhancer 2.0 and maintainer of the v1.5.x community fork, introducing telemetry systems, HOPA defect alerts, interactive dispatching, tile streaming, and 0.6 native architecture.
 - **Cartography & Spatial Data:**
   - **OpenStreetMap Contributors** — Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) under ODbL 1.0. Cartographic stylesheet `openstreetmap-carto` under CC-BY-SA 2.0. Offline tiles rendered locally via private toolchain.
-  - **U.S. Geological Survey (USGS)** — Appalachian topographic contours, hillshading, waterways, and elevations courtesy of USGS The National Map (Public Domain).
+  - **U.S. Geological Survey (USGS) & USDA NAIP** — Appalachian topographic contours, NAIP aerial orthoimagery, hillshading, waterways, and elevations courtesy of USGS The National Map & USDA FPAC (Public Domain).
 - **Community Contributors & Testers** — Railroader community members who contributed bug reports, multiplayer testing, track geometry feedback, and suggestions.
 
 ### Source Repositories
@@ -997,7 +1029,7 @@ When updating Map Enhancer to a newer version:
 - Deleting the folder permanently erases:
   1. **`settings.json`** — Custom keybindings, overlay colors, car trim sliders, zoom thresholds, and options.
   2. **`Backgrounds/`** — Any custom maps, diagrams, and companion calibration JSON files you added.
-  3. **`Tiles/`** — Pre-downloaded offline USGS Topo (~692 MB) and OpenStreetMap (~76.5 MB) map tile packs.
+  3. **`Tiles/`** — Pre-downloaded offline USGS Topo (~692 MB), USGS Satellite & Topo (~926 MB), and OpenStreetMap (~76.5 MB) map tile packs.
 
 Use either **Method 1 (Automated 1-Click Installer)** or **Method 2 (Safe Manual Update)** below.
 
@@ -1031,16 +1063,17 @@ Map Enhancer supports 100% offline local slippy map tiles with zero network requ
 2. Choose from the interactive menu:
    - **`[1]` USGS Topographic Corridor Pack (~692 MB, 6,040 tiles, Zooms 12–16):** Authentic Appalachian mountain contours, elevations, waterways, and historical alignments from USGS The National Map (100% US Government Public Domain).
    - **`[2]` OpenStreetMap Corridor Pack (~76.5 MB, 23,315 tiles, Zooms 12–17):** High-contrast street, river, highway GIS cartography with razor-sharp yard switching detail (~0.97 m/px).
-   - **`[3]` Both Packs (~768 MB Total):** Recommended for instant dual-provider toggling in the game.
-3. The script displays real-time download speed and progress, verifies the cryptographic **SHA256 checksum**, and automatically extracts all tiles into `Tiles\USGSTopo\` or `Tiles\OSM\`.
+   - **`[3]` USGS Satellite & Topo Corridor Pack (~926 MB, 6,040 tiles, Zooms 12–16):** High-resolution USDA NAIP aerial orthoimagery with USGS contours, rivers, roads, and station place names.
+   - **`[4]` All 3 Packs (~1.65 GB Total):** Recommended for instant multi-provider toggling in the game.
+3. The script displays real-time download speed and progress, verifies the cryptographic **SHA256 checksum**, and automatically extracts all tiles into `Tiles\USGSTopo\`, `Tiles\OSM\`, or `Tiles\USGSImageryTopo\`.
 
 **In-Game Activation:**
 
 1. Start Railroader and load your world.
 2. Press **`M`** to open the map (Railroader default).
-3. Press **`Ctrl+M`** (or click the **`[ME]`** button in the upper-right corner) to open mod options.
+3. Press **`Ctrl+M`** (or click the **`[ME]`** button in the upper-left corner) to open mod options.
 4. Set **Map Background** to **`Map Tiles (Local Tile Packs)`**.
-5. Select **`USGSTopo`** or **`OSM`** from the **Tile Set** dropdown.
+5. Select **`USGSTopo`**, **`USGSImageryTopo`**, or **`OSM`** from the **Tile Set** dropdown.
 
 ---
 
@@ -1066,6 +1099,7 @@ Map Enhancer supports 100% offline local slippy map tiles with zero network requ
 
 **Manual Offline Tile Pack Locations:**
 
+- **USGS Satellite & Topo Archive:** Extract to `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSImageryTopo\` (SHA256: `E3612DD9F3129684DB65877CD53C08CAF0D1B1147B99D647CF0C058CCD3C74A7`)
 - **USGS Topo Archive:** Extract to `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\` (SHA256: `0539BEFAA157DB5CCAB136FCA0B485EEAD6F0BEED6457AA53EF973F49CFD53F8`)
 - **OpenStreetMap Archive:** Extract to `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\OSM\` (SHA256: `40587516F526027644A593829D23F590A20DFC00280204137C0B72B03322AE5E`)
 
@@ -1077,6 +1111,7 @@ Map Enhancer supports 100% offline local slippy map tiles with zero network requ
 | :--------------------------- | :------------------------ | :------------------------------------------------------------------------- |
 | **`M`**                      | **Open / Close Map**      | Railroader default key to open or close the map.                           |
 | **`Ctrl + M`**               | **Map Enhancer Settings** | Opens the Map Enhancer Options & Overlay Configuration panel.              |
+| **`Ctrl + H`**               | **Inspection HUD**        | Shows or hides the dedicated Inspection HUD window (like clicking `HUD`).  |
 | **`Z`**                      | **Maximize / Float Map**  | Toggles between compact docked view and large floating resizable window.   |
 | **`Shift + Z`**              | **Follow Selected Car**   | Camera smoothly tracks the active locomotive or railcar.                   |
 | **`Ctrl + Z`**               | **Recenter Camera**       | Instantly centers map camera on player world position.                     |

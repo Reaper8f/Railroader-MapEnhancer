@@ -10,6 +10,10 @@ Our core design principle: **Operational realism, dispatching ease, and player i
 
 | Status             | Focus Area                        | Description                                                                           |     Target     |
 | :----------------- | :-------------------------------- | :------------------------------------------------------------------------------------ | :------------: |
+| 🟢 **Completed**   | **USGS Satellite & Topo Pack**    | 3rd offline tile pack (`USGSImageryTopo`, NAIP orthoimagery + contours & labels).     |  **v2.0.17**   |
+| 🟢 **Completed**   | **3 Hover HUD Modes & Window**    | Attached, Cursor, and detached Inspection HUD window (`Ctrl+H`) with Loco+Consist.    |  **v2.0.17**   |
+| 🟢 **Completed**   | **Intelligent Coupling Dispatch** | Coupling-point availability checks, run-around/reverse routing, Route Preview hotkey.  |  **v2.0.17**   |
+| 🟢 **Completed**   | **Track Condition Metric Sync**   | Hover Class/Speed/Weeds details paired with Per-Class vs Overall Condition overlay.   |  **v2.0.17**   |
 | 🟢 **Completed**   | **Offline Topo & Slippy Tiles**   | 100% offline USGS Topo & OSM tile streaming with smooth zoom transitions.             |  **v2.0.16**   |
 | 🟢 **Completed**   | **Physical Safe Speed Overlay**   | Curve geometry analysis color-coding safe corridor speeds to prevent derailments.     |  **v2.0.16**   |
 | 🟢 **Completed**   | **Waypoint Dispatch & Coupling**  | Click-to-dispatch locomotive navigation and click-to-couple via AutoEngineer.         |  **v2.0.15**   |
