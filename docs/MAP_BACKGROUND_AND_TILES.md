@@ -1,6 +1,6 @@
 # Map Enhancer — Map Backgrounds & Slippy Tile Overlay Guide
 
-This guide covers the **Map Background & Slippy Tile Streaming Subsystem** in Railroader Map Enhancer (v2.0.16+). It explains how each background mode works, how to configure custom background images and calibration files, and how to install and stream 100% offline USGS Topo and OpenStreetMap tile packs.
+This guide covers the **Map Background & Slippy Tile Streaming Subsystem** in Railroader Map Enhancer (v2.0.17+). It explains how each background mode works, how to configure custom background images and calibration files, and how to install and stream 100% offline USGS Topo, USGS Satellite & Topo, and OpenStreetMap tile packs.
 
 ---
 
@@ -35,7 +35,7 @@ Map Enhancer provides three distinct background rendering modes:
 | :--- | :---: | :--- |
 | **Disabled** | `0` | Standard vanilla Railroader map (plain dark canvas background). |
 | **Custom Image** | `1` | Renders a custom image (historical map, aerial orthophoto, or hand-drawn track chart) placed in `Backgrounds/`. Auto-fits to track boundaries or uses millimeter-accurate companion JSON calibration. |
-| **Map Tiles** *(Recommended)* | `2` | 100% local slippy map tile streaming subsystem. Dynamically discovers and loads tile packs installed in `Tiles/<Folder>/` (such as `USGSTopo` or `OSM`), or falls back to Railroader's native GIS cache for OSM. Zero network requests are initiated by the mod. |
+| **Map Tiles** *(Recommended)* | `2` | 100% local slippy map tile streaming subsystem. Dynamically discovers and loads tile packs installed in `Tiles/<Folder>/` (such as `USGSTopo`, `USGSImageryTopo`, or `OSM`), or falls back to Railroader's native GIS cache for OSM. Zero network requests are initiated by the mod. |
 
 > [!NOTE]
 > **Automatic Settings Migration:** Older configurations using legacy Mode `2` (USGS Topo) or Mode `3` (OpenStreetMap) are seamlessly migrated to Mode `2` (`Map Tiles`) with their respective folder (`USGSTopo` or `OSM`) automatically preserved.
@@ -49,7 +49,7 @@ Map Enhancer provides three distinct background rendering modes:
 3. In **Section 1: Map Display, Backgrounds & Slippy Tiles**:
    - **Map Background Mode:** Select `Disabled (Default Map)`, `Custom Image`, or `Map Tiles (Local Tile Packs)`.
    - **When Map Tiles is Selected:**
-     - **Tile Set Selector:** Choose which tile pack to stream (`USGSTopo`, `OSM`, or any custom folder placed in `Tiles/`).
+     - **Tile Set Selector:** Choose which tile pack to stream (`USGSTopo`, `USGSImageryTopo`, `OSM`, or any custom folder placed in `Tiles/`).
      - **Provider Info:** Displays total tiles found on disk, supported zoom ranges (e.g. Zooms 12–16 for USGS, Zooms 12–17 for OSM), and status.
      - **Rescan & Reload Tiles Button:** Triggers an asynchronous background disk scan and refreshes the tile grid without interrupting gameplay.
      - **Trim Map to Corridor:** When checked, restricts tile streaming strictly to the active track corridor polygon, saving VRAM.
@@ -187,12 +187,13 @@ Map Enhancer discovers tile packs dynamically in `Tiles/<FolderName>/`, supporti
 
 ## 5. Pre-Packaged Offline Tiles (Andrews to Sylva Corridor)
 
-Two pre-packaged offline tile sets covering the entire Railroader corridor from Andrews to Sylva are officially available:
+Three pre-packaged offline tile sets covering the entire Railroader corridor from Andrews to Sylva are officially available:
 
 ### Available Tile Packages
 
 | Package | File | Size | Zooms | Tiles | Description | SHA256 Checksum |
 | :--- | :--- | :---: | :---: | :---: | :--- | :--- |
+| **USGS Satellite & Topo** | `MapEnhancer_Tiles_USGSImageryTopo_Andrews_to_Sylva.zip` | 926 MB | 12–16 | 6,040 | High-resolution USDA NAIP aerial photography overlaid with USGS topographic contours, rivers, roads, and station place names (100% US Government Public Domain). | `E3612DD9F3129684DB65877CD53C08CAF0D1B1147B99D647CF0C058CCD3C74A7` |
 | **USGS Topo** | `MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip` | 692 MB | 12–16 | 6,040 | Authentic Appalachian mountain topography, elevation contours, hydrology, and historical railroad alignments from USGS The National Map (100% US Government Public Domain). | `0539BEFAA157DB5CCAB136FCA0B485EEAD6F0BEED6457AA53EF973F49CFD53F8` |
 | **OpenStreetMap** | `MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip` | 76.5 MB | 12–17 | 23,315 | High-contrast GIS street, river, highway, and yard cartography with razor-sharp switching detail (~0.97 m/px). | `40587516F526027644A593829D23F590A20DFC00280204137C0B72B03322AE5E` |
 
@@ -207,22 +208,24 @@ Every Map Enhancer release ZIP includes **`downloadtiles.bat`**:
 3. Select an option from the menu:
    - `[1]` **Download USGS Topographic Corridor Pack** (692 MB)
    - `[2]` **Download OpenStreetMap Corridor Pack** (76.5 MB)
-   - `[3]` **Download Both Packs** (~768 MB Total — Recommended)
-4. The script automatically downloads the packages from GitHub Releases, validates the cryptographic **SHA256 checksum**, and extracts the tiles into `Tiles\USGSTopo\` and `Tiles\OSM\`.
+   - `[3]` **Download USGS Satellite & Topo Corridor Pack** (926 MB)
+   - `[4]` **Download ALL 3 Packs** (~1.65 GB Total — Recommended)
+4. The script automatically downloads the packages from GitHub Releases (`map-tiles-v1`), validates the cryptographic **SHA256 checksum**, and extracts the tiles into `Tiles\USGSTopo\`, `Tiles\OSM\`, and `Tiles\USGSImageryTopo\`.
 
 ---
 
 ### Manual Download & Verification
 
-If downloading manually from the [GitHub Releases page](../../releases):
+If downloading manually from the [GitHub Releases (`map-tiles-v1`)](../../releases/tag/map-tiles-v1):
 
-1. Download `MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip` or `MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip`.
+1. Download `MapEnhancer_Tiles_USGSImageryTopo_Andrews_to_Sylva.zip`, `MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip`, or `MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip`.
 2. Extract the archives into their respective folders:
    ```text
+   Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSImageryTopo\
    Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\
    Documents\Railroader\Mods\reaper-map-enhancer\Tiles\OSM\
    ```
-3. Inside `Tiles\USGSTopo\`, you should see zoom subfolders (e.g. `12\`, `13\`, `14\`, `15\`, `16\`) or flat tile files.
+3. Inside each provider directory, you should see flat tile files (e.g. `12-1093-1615.tile`) or zoom subfolders (`12` through `17`).
 4. In Railroader, press **`M`** to open the map, press **`Ctrl+M`** to open Settings, set **Map Background** to **`Map Tiles`**, and select your tile set.
 
 ---
@@ -235,12 +238,12 @@ If downloading manually from the [GitHub Releases page](../../releases):
 ### Q: Why do tiles appear black when I select "Map Tiles"?
 **A:**
 1. Check that the tile packs are actually extracted into your active mod directory:
-   `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\` or `Tiles\OSM\`
+   `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\`, `Tiles\USGSImageryTopo\`, or `Tiles\OSM\`
 2. In Settings (`Ctrl+M`), click **"Rescan & Reload Tiles"** to force the background tile scanner to re-index the directories.
 3. If you use OneDrive, verify that your Documents folder is not keeping the tile files as "cloud-only" stubs; ensure they are marked as "Always keep on this device".
 
-### Q: Can I install both USGS Topo and OpenStreetMap packs at the same time?
-**A:** Yes! Extract each pack into its respective folder (`Tiles\USGSTopo\` and `Tiles\OSM\`). In-game, open Settings (`Ctrl+M`) and use the **Tile Set** dropdown to switch between them instantly.
+### Q: Can I install USGS Topo, USGS Satellite & Topo, and OpenStreetMap packs at the same time?
+**A:** Yes! Extract each pack into its respective folder (`Tiles\USGSTopo\`, `Tiles\USGSImageryTopo\`, and `Tiles\OSM\`). In-game, open Settings (`Ctrl+M`) and use the **Tile Set** dropdown to switch between them instantly.
 
 ### Q: Why does my custom image look stretched or misaligned?
 **A:**

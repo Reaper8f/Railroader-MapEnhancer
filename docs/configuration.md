@@ -16,6 +16,7 @@ All Map Enhancer keybindings can be customized directly in the in-game settings 
 |---|---|---|
 | **`M`** | **Open / Close Map** | Game native key to toggle the Railroader map window. |
 | **`Ctrl + M`** | **Map Enhancer Settings** | Opens the dedicated 10-section configuration window. |
+| **`Ctrl + H`** | **Inspection HUD** | Show or hide the dedicated Inspection HUD window (like clicking the HUD toolbar button). |
 | **`Z`** | **Maximize / Float Map** | Toggles between compact docked view and resizable floating window. |
 | **`Shift + Z`** | **Follow Active Train** | Smoothly locks the camera to follow the selected train or locomotive. |
 | **`Ctrl + Z`** | **Recenter Camera** | Instantly centers map view on player's current world position. |
@@ -35,7 +36,7 @@ All Map Enhancer keybindings can be customized directly in the in-game settings 
 | Setting | Default | Description |
 |---|---|---|
 | **Map Background Mode** | `Disabled` | Cartography mode: `Disabled` (native dark), `Custom Image` (orthophoto), or `Map Tiles` (slippy tiles). |
-| **Tile Set Selector** | `USGSTopo` | Discovers available tile packs (`USGSTopo`, `OSM`, or custom folders in `Tiles\`). |
+| **Tile Set Selector** | `USGSTopo` | Discovers available tile packs (`USGSTopo`, `USGSImageryTopo`, `OSM`, or custom folders in `Tiles\`). |
 | **Rescan & Reload Tiles** | Button | Re-indexes tile folders and reloads active pyramid tiles without restarting. |
 | **Background Opacity** | `40%` | Controls tile transparency ($0\%–100\%$) beneath the track network. |
 | **Trim Map to Corridor** | `Off` | Restricts tile streaming strictly to the active track corridor, saving VRAM. |
@@ -64,10 +65,14 @@ All Map Enhancer keybindings can be customized directly in the in-game settings 
 | Setting | Default | Description |
 |---|---|---|
 | **Active Map Overlay** | `Routes` | Centralized overlay mode: `Routes`, `Grade`, `Curvature`, `TrackClass`, `Condition`, `Cleanliness`. |
+| **Condition Overlay Metric** | `Per-Class Target` | Chooses whether the Condition track overlay draws using `Per-Class Target` or `Overall Physical (0–100%)` and syncs the map legend. |
 | **Slope Pointer Arrows** | `Off` | Renders directional arrows along tracks indicating uphill/downhill slope. |
 | **Slope Pointer Scale** | `Normal (1.0x)` | Scale of slope direction arrows (`Small 0.6x`, `Normal 1.0x`, `Large 1.5x`). |
 | **Min Grade Intensity** | `1.0%` | Minimum slope threshold required before grade markers activate ($0.1\%–3.0\%$). |
 | **Grade Hover Tooltip** | `Enabled` | Displays real-time grade percentage when hovering any track segment. |
+| **Track Class, Condition & Speed** | `Off` | Displays FRA track class (1–5) and effective speed limit on track hover. |
+| **Track Condition & Weed Growth** | `Off` | Displays condition percentage and right-of-way weed growth on track hover. |
+| **Hover Track Metric Display** | `Per-Class Target` | Controls hover track condition format: `Per-Class Target (Relative)`, `Overall Physical (0-100%)`, or `Both`. |
 | **Grade Color Bands** | 5 Tiers | Slope color palette: `<0.5%` (Blue), `0.5–1%` (Green), `1–2%` (Yellow), `2–3%` (Orange), `>3%` (Red). |
 | **Reset Grade Colors** | Button | Restores factory slope color thresholds. |
 
@@ -97,6 +102,7 @@ All Map Enhancer keybindings can be customized directly in the in-game settings 
 ### 6. Train & Cargo Telemetry
 | Setting | Default | Description |
 |---|---|---|
+| **Hover HUD Display Mode** | `Attached to Map` | Presentation mode for track/train hover details: `Attached to Map`, `Hover Window` (follows cursor), or `Hover Pinned Window` (detached, resizable Inspection HUD window with `Ctrl+H` hotkey & map `HUD` button). |
 | **Train Hover Tooltip** | `Enabled` | Master toggle for detailed train hover HUD. |
 | **Show Engineer / Driver** | `Enabled` | Displays player name or AI assignment. |
 | **Show Train Stats** | `Enabled` | Displays current speed, total tonnage, car count, and train length. |

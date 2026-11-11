@@ -27,9 +27,11 @@ This repository is the **official public project hub** — home to releases, doc
   - **Condition & Cleanliness:** Real-time track maintenance wear and ballast weed telemetry.
 - **Offline Slippy Map Backgrounds:** Stream authentic 100% offline multi-resolution map tiles with zero network requests:
   - **USGS Topo Pack:** Authentic Appalachian mountain contours, hydrology, elevations, and historical rights-of-way from USGS The National Map.
+  - **USGS Satellite & Topo Pack:** High-resolution USDA NAIP aerial orthoimagery overlaid with USGS contours, rivers, roads, and station place names.
   - **OpenStreetMap Pack:** Crisp GIS vector roads, waterways, rail yards, and towns.
   - **Custom Calibration:** Support for high-res orthophotos and companion `calibration.json`.
-- **Interactive Locomotive Dispatch:** Hold `CapsLock` and left-click any track segment or car marker to dispatch selected locomotives with automatic route pathfinding, real-time coupling ribbons, and automatic handbrake release.
+- **3 Hover HUD Modes & Inspection Window:** Switch between Attached to Map, Hover Window, or a dedicated resizable **Inspection HUD** window (`Ctrl+H`) featuring structured telemetry for Locomotives/Tenders + Consists, Freight Cars, Tracks, Stations, and Player Signs.
+- **Interactive Locomotive Dispatch:** Hold `CapsLock` and left-click any track segment or car marker to dispatch selected locomotives with intelligent coupling-point reachability pathfinding, real-time coupling ribbons, and automatic handbrake release.
 - **Smart Handbrakes & Context Menu:** Right-click any rolling stock marker to calculate grade-calibrated holding brakes (10%, 25%, 50%), bleed reservoirs, connect air, or cut throttle/reverser from the map.
 - **HOPA Operational Alerts:** Dedicated rolling stock alert monitoring for Hotboxes, Low Lubricating Oil, Dragging Handbrakes, Train Line Air Leaks, and In-Motion Derailments with on-map warning badges.
 - **Turntable Stepper & Clearance:** Rotate turntable bridges in precise increments (`Ctrl+Click`, `Alt+Click`, `Ctrl+Shift+Click`) with automatic fouling clearance protection preventing derailments.
@@ -56,8 +58,9 @@ Download compiled mod releases and optional tile packs directly from the **[GitH
 
 | Package | Content | Size |
 |---|---|---|
-| **`reaper-mapenhancer-2.0.16.zip`** *(Complete Edition)* | Full mod binaries (`MapEnhancer.dll`), Harmony, UI assets, `install.bat`, and `downloadtiles.bat` | ~1.8 MB |
-| **`reaper-mapenhancer-2.0.16-nexus.zip`** *(Nexus Mods Edition)* | Clean mod binaries, Harmony, UI assets, and guides (zero `.bat` scripts for instant security clearance) | ~1.8 MB |
+| **`reaper-mapenhancer-2.0.17.zip`** *(Complete Edition)* | Full mod binaries (`MapEnhancer.dll`), Harmony, UI assets, `install.bat`, and `downloadtiles.bat` | ~1.8 MB |
+| **`reaper-mapenhancer-2.0.17-nexus.zip`** *(Nexus Mods Edition)* | Clean mod binaries, Harmony, UI assets, and guides (zero `.bat` scripts for instant security clearance) | ~1.8 MB |
+| **`MapEnhancer_Tiles_USGSImageryTopo_Andrews_to_Sylva.zip`** | 100% offline USGS Satellite (NAIP) + Topo corridor tiles (Zoom 12–16) | 926 MB |
 | **`MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip`** | 100% offline USGS Topographical corridor tiles (Zoom 12–16) | 692 MB |
 | **`MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip`** | 100% offline OpenStreetMap corridor tiles (Zoom 12–17) | 76.5 MB |
 

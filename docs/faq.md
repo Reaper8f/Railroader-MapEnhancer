@@ -27,7 +27,20 @@ Map Enhancer 2.0 targets **Railroader 0.6.0+ Experimental** (native C# modding).
 - If copying manually, choose **"Replace the files in the destination"** without deleting the folder. Never delete your entire `reaper-map-enhancer` directory when updating.
 
 ### Can I use Map Enhancer in Multiplayer?
-**Yes.** Map Enhancer is client-side safe in multiplayer games. Clients with Map Enhancer can view telemetry, overlays, offline map backgrounds, and use waypoint dispatching.
+**Yes.** Map Enhancer is client-side safe in multiplayer games. Clients with Map Enhancer can view telemetry, overlays, offline map backgrounds, and use waypoint dispatching. If the host has not enabled the mod, replace the client mod entry in `Documents\Railroader\Preferences.json` with:
+
+```json
+"clientMods": [
+  {
+    "identifier": "reaper/map-enhancer",
+    "version": "2.0.16",
+    "enabled": true,
+    "scope": 2
+  }
+],
+```
+
+Keep the surrounding `Preferences.json` structure valid JSON, then start or join the multiplayer session.
 
 ### Do offline map tiles require an internet connection?
 **No.** Once downloaded, all tiles live on your local drive in `Tiles\USGSTopo\` or `Tiles\OSM\`. During gameplay, Map Enhancer makes zero network calls and works completely offline.

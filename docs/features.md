@@ -1,8 +1,8 @@
 # Map Enhancer for Railroader — Comprehensive Features Guide
 
 **Target Game Version:** Railroader 0.6.0+ Experimental  
-**Current Mod Version:** v2.0.16  
-**Package:** `reaper-mapenhancer-2.0.16.zip`  
+**Current Mod Version:** v2.0.17  
+**Package:** `reaper-mapenhancer-2.0.17.zip`  
 **Official Website:** [https://mapenhancer.refizar.in](https://mapenhancer.refizar.in)  
 **My Discord:** [https://discord.refizar.in](https://discord.refizar.in)  
 **RailRoader Discord:** [https://discord.gg/r8xeTPAnhw](https://discord.gg/r8xeTPAnhw)
@@ -159,12 +159,13 @@ Add realistic geographic maps and topographic mountain terrain beneath your rail
   <br><em>Authentic Appalachian USGS Topo mountain contours, waterways, and elevations.</em>
 </p>
 
-### 3.1 Background Architecture & Modes `[ME2.0 v2.0.16]`
+### 3.1 Background Architecture & Modes `[ME2.0 v2.0.17]`
 
 1. **`Disabled (Default Map)`** — Clean, plain vanilla canvas background.
 2. **`Custom Image`** — Load your own historical track chart, aerial photo, or map drawing from the `Backgrounds/` folder. Supports automatic track boundary fitting or companion `.json` coordinate calibration.
 3. **`Map Tiles (Unified Local Tile Subsystem)`** — High-performance, 100% local-only slippy tile streaming subsystem. Select any installed tile pack from the dynamic dropdown:
    - **`USGSTopo`** _(Recommended)_: Authentic Appalachian mountain topography, contour lines, elevations, waterways, and historical alignments (U.S. Geological Survey Public Domain) spanning Zooms 12–16.
+   - **`USGSImageryTopo`**: High-resolution USDA NAIP aerial satellite orthoimagery layered with USGS topographic contours, rivers, roads, and station labels spanning Zooms 12–16.
    - **`OSM`**: High-contrast street, track, and water features from OpenStreetMap offline packs or automatically discovered native Railroader GIS session caches spanning Zooms 12–17.
    - **Custom Packs**: Drop any folder of Web Mercator tiles into `Tiles/<YourPackName>/` and Map Enhancer will detect and list it automatically.
 
@@ -193,20 +194,24 @@ Add realistic geographic maps and topographic mountain terrain beneath your rail
   - **Rescan & Reload Tiles Button:** Triggers an immediate background disk rescan and refreshes the tile grid without interrupting gameplay.
   - **Background Opacity Slider:** Fade the background from $0\%$ (hidden) to $100\%$ (full strength), keeping tracks and cars easily readable (recommended: $40\% – 60\%$).
 
-### 3.4 Pre-Packaged Offline Corridor Tile Packs `[ME2.0 v2.0.16]`
+### 3.4 Pre-Packaged Offline Corridor Tile Packs `[ME2.0 v2.0.17]`
 
-Two distinct pre-rendered offline tile archives provide 100% complete coverage for the entire Railroader mountain corridor (Andrews $\to$ Bryson City $\to$ Sylva, including Whittier, Dillsboro, Ela, and Fontana Branch) with zero active internet connection required during gameplay:
+Three distinct pre-rendered offline tile archives provide 100% complete coverage for the entire Railroader mountain corridor (Andrews $\to$ Bryson City $\to$ Sylva, including Whittier, Dillsboro, Ela, and Fontana Branch) with zero active internet connection required during gameplay:
 
-1. **`MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip`** (76.5 MB):
+1. **`MapEnhancer_Tiles_USGSImageryTopo_Andrews_to_Sylva.zip`** (926 MB):
+   - **Coverage:** 6,040 tiles spanning **Zooms 12 through 16** (100% corridor coverage).
+   - **Cartography:** High-resolution USDA NAIP aerial photography overlaid with USGS topographic contours, rivers, roads, and station place names.
+   - **Installation:** Extract into `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSImageryTopo\`.
+2. **`MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip`** (692 MB):
+   - **Coverage:** 6,040 tiles spanning **Zooms 12 through 16** (100% corridor coverage).
+   - **Cartography:** Authentic USGS topographic contours, hillshading, waterways, and elevations from USGS The National Map.
+   - **Installation:** Extract into `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\`.
+3. **`MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip`** (76.5 MB):
    - **Coverage:** 23,315 tiles spanning all zoom levels from **Zoom 12 down to Zoom 17**.
    - **Cartography:** High-contrast street, track, and water rendering generated locally via Docker Mapnik from OpenStreetMap North Carolina extracts.
-   - **Installation:** Extract into `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\OSM\{z}\{x}\{y}.png` (or flat `Tiles\OSM\{z}-{x}-{y}.png`).
-2. **`MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip`** (692 MB):
-   - **Coverage:** 6,040 tiles spanning **Zooms 12 through 16**.
-   - **Cartography:** Authentic USGS topographic contours, hillshading, waterways, and elevations from USGS The National Map.
-   - **Installation:** Extract into `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\{z}\{x}\{y}.png` (or flat `Tiles\USGSTopo\{z}-{x}-{y}.png`).
+   - **Installation:** Extract into `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\OSM\`.
 
-- **Side-by-Side Dual Installation:** Both tile packs can be installed simultaneously in their respective subfolders (`Tiles\OSM\` and `Tiles\USGSTopo\`). Map Enhancer automatically detects each provider and seamlessly switches between them when you toggle tile sets in the in-game options menu (`Ctrl+M`).
+- **Side-by-Side Installation:** All three tile packs can be installed simultaneously in their respective subfolders (`Tiles\USGSImageryTopo\`, `Tiles\USGSTopo\`, and `Tiles\OSM\`). Map Enhancer automatically detects each provider and seamlessly switches between them when you toggle tile sets in the in-game options menu (`Ctrl+M`).
 
 ---
 

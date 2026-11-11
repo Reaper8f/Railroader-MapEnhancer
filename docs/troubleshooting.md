@@ -64,6 +64,7 @@ Select-String -Path "$env:USERPROFILE\AppData\LocalLow\Giraffe Lab LLC\Railroade
   1. Run `downloadtiles.bat` inside your mod directory to download the packs automatically.
   2. If installing manually, verify tiles are extracted into:
      - `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\` ...
+     - `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSImageryTopo\` ...
      - `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\OSM\` ...
   3. In Settings (`Ctrl+M`), click **"Rescan & Reload Tiles"**.
 
@@ -86,7 +87,7 @@ If your problem is not covered in this guide, report the issue through our offic
 ### What to include in your report:
 
 - Exact Railroader version (e.g. `0.6.2 Experimental`)
-- Map Enhancer version (e.g. `v2.0.16`)
+- Map Enhancer version (e.g. `v2.0.17`)
 - Relevant error snippet or stack trace from `Player.log`
 - Steps to reproduce the issue
 - List of other installed mods

@@ -10,8 +10,8 @@ Map Enhancer is distributed in two official release packages:
 
 | Package | Intended For | Contents |
 |:---|:---|:---|
-| **Complete Package**<br>`reaper-mapenhancer-2.0.16.zip` | Website & GitHub users wanting 1-click automated setup | Mod binaries (`MapEnhancer.dll`, `0Harmony.dll`), marker icons, `Info.json`, plus **`install.bat`** (automated installer/updater) and **`downloadtiles.bat`** (offline tile downloader). |
-| **Nexus Mods Edition**<br>`reaper-mapenhancer-2.0.16-nexus.zip` | Nexus Mods downloaders | Clean mod binaries, marker icons, `Info.json`, and guides. Contains **zero batch scripts** to guarantee automated security verification and instant approval. |
+| **Complete Package**<br>`reaper-mapenhancer-2.0.17.zip` | Website & GitHub users wanting 1-click automated setup | Mod binaries (`MapEnhancer.dll`, `0Harmony.dll`), marker icons, `Info.json`, plus **`install.bat`** (automated installer/updater) and **`downloadtiles.bat`** (offline tile downloader). |
+| **Nexus Mods Edition**<br>`reaper-mapenhancer-2.0.17-nexus.zip` | Nexus Mods downloaders | Clean mod binaries, marker icons, `Info.json`, and guides. Contains **zero batch scripts** to guarantee automated security verification and instant approval. |
 
 ---
 
@@ -22,14 +22,14 @@ When updating Map Enhancer to a newer version:
 - Deleting the directory will erase:
   - `settings.json` (your custom keybindings, track colors, zoom limits, and alert thresholds).
   - `Backgrounds/` (your custom orthophoto images and calibration JSON files).
-  - `Tiles/` (your downloaded offline USGS Topo and OpenStreetMap tile packs).
+  - `Tiles/` (your downloaded offline USGS Topo, USGS Satellite & Topo, and OpenStreetMap tile packs).
 - Always overwrite existing files or use `install.bat`.
 
 ---
 
 ## Method 1: Automated 1-Click Installer (Complete Package)
 
-*Included in the **Complete Package** (`reaper-mapenhancer-2.0.16.zip`).*
+*Included in the **Complete Package** (`reaper-mapenhancer-2.0.17.zip`).*
 
 1. Download the Complete Package from the [Website](https://mapenhancer.refizar.in/download) or [GitHub Releases](../../releases).
 2. Extract the archive into any temporary location (e.g. your `Downloads` folder).
@@ -87,6 +87,7 @@ Documents\Railroader\Mods\reaper-map-enhancer\
 ├── Backgrounds\                    (User custom images & calibration)
 └── Tiles\                          (Offline tile packs)
     ├── USGSTopo\
+    ├── USGSImageryTopo\
     └── OSM\
 ```
 
@@ -119,11 +120,16 @@ Map Enhancer supports 100% offline local map tile streaming with zero internet r
 2. Select an option:
    - `[1]` **USGS Topographic Corridor Pack** (~692 MB, 6,040 tiles, Zooms 12–16)
    - `[2]` **OpenStreetMap Corridor Pack** (~76.5 MB, 23,315 tiles, Zooms 12–17)
-   - `[3]` **Both Packs** (~768 MB Total — Recommended)
-3. The script downloads the packs, validates cryptographic SHA256 checksums, and extracts tiles directly into `Tiles\USGSTopo\` and `Tiles\OSM\`.
+   - `[3]` **USGS Satellite & Topo Corridor Pack** (~926 MB, 6,040 tiles, Zooms 12–16)
+   - `[4]` **All 3 Packs** (~1.65 GB Total — Recommended)
+3. The script downloads the packs, validates cryptographic SHA256 checksums, and extracts tiles directly into `Tiles\USGSTopo\`, `Tiles\OSM\`, and `Tiles\USGSImageryTopo\`.
 
 ### Option B: Manual Tile Download (Nexus Mods & Direct Downloaders)
-Download tile archives from [GitHub Releases](../../releases) or the [Website](https://mapenhancer.refizar.in/download) and extract them into your mod folder:
+Download tile archives from [GitHub Releases (`map-tiles-v1`)](../../releases/tag/map-tiles-v1) or the [Website](https://mapenhancer.refizar.in/downloads) and extract them into your mod folder:
+
+- **USGS Satellite & Topo Archive (`MapEnhancer_Tiles_USGSImageryTopo_Andrews_to_Sylva.zip`):**  
+  Extract into: `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSImageryTopo\`  
+  *(SHA256: `E3612DD9F3129684DB65877CD53C08CAF0D1B1147B99D647CF0C058CCD3C74A7`)*
 
 - **USGS Topo Archive (`MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip`):**  
   Extract into: `Documents\Railroader\Mods\reaper-map-enhancer\Tiles\USGSTopo\`  
@@ -135,6 +141,6 @@ Download tile archives from [GitHub Releases](../../releases) or the [Website](h
 
 ### Activating Tiles In-Game
 1. In Railroader, press **`M`** to open the map.
-2. Press **`Ctrl+M`** (or click the **`[ME]`** button in the upper-right corner) to open Settings.
+2. Press **`Ctrl+M`** (or click the **`[ME]`** button in the upper-left corner) to open Settings.
 3. In Section 1, set **Map Background Mode** to **`Map Tiles (Local Tile Packs)`**.
-4. Select **`USGSTopo`** or **`OSM`** in the **Tile Set** dropdown.
+4. Select **`USGSTopo`**, **`USGSImageryTopo`**, or **`OSM`** in the **Tile Set** dropdown.
