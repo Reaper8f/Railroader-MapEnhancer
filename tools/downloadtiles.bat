@@ -37,6 +37,11 @@ $OSM_HASH = "40587516F526027644A593829D23F590A20DFC00280204137C0B72B03322AE5E"
 $OSM_EXPECTED_TILES = 23315
 $OSM_SIZE_MB = "76.5 MB"
 
+$IMAGERY_TOPO_URL = "https://github.com/Reaper8f/Railroader-MapEnhancer/releases/download/map-tiles-v1/MapEnhancer_Tiles_USGSImageryTopo_Andrews_to_Sylva.zip"
+$IMAGERY_TOPO_HASH = "E3612DD9F3129684DB65877CD53C08CAF0D1B1147B99D647CF0C058CCD3C74A7"
+$IMAGERY_TOPO_EXPECTED_TILES = 6040
+$IMAGERY_TOPO_SIZE_MB = "926 MB"
+
 function Write-Header {
     Write-Host ""
     Write-Host "======================================================================" -ForegroundColor Cyan
@@ -91,6 +96,7 @@ function Get-TileCounts {
 
     $usgsDir = Join-Path $TilesDir "USGSTopo"
     $osmDir = Join-Path $TilesDir "OSM"
+    $imageryDir = Join-Path $TilesDir "USGSImageryTopo"
 
     $usgsCount = 0
     if (Test-Path -LiteralPath $usgsDir) {
@@ -102,9 +108,15 @@ function Get-TileCounts {
         $osmCount = (Get-ChildItem -LiteralPath $osmDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".tile" -or $_.Extension -eq ".png" }).Count
     }
 
+    $imageryCount = 0
+    if (Test-Path -LiteralPath $imageryDir) {
+        $imageryCount = (Get-ChildItem -LiteralPath $imageryDir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".tile" -or $_.Extension -eq ".png" }).Count
+    }
+
     return @{
-        USGS = $usgsCount
-        OSM  = $osmCount
+        USGS        = $usgsCount
+        OSM         = $osmCount
+        ImageryTopo = $imageryCount
     }
 }
 
@@ -181,17 +193,22 @@ function Download-And-Install-Pack {
 
     if ($existingLocalZip) {
         Write-Host "  Found local archive in: $existingLocalZip" -ForegroundColor Yellow
-        Write-Host "  Verifying package integrity (SHA256)..." -NoNewline -ForegroundColor Gray
-        $localHash = (Get-FileHash -LiteralPath $existingLocalZip -Algorithm SHA256).Hash.ToUpper()
-        if ($localHash -eq $ExpectedHash.ToUpper()) {
-            Write-Host " VERIFIED [OK]" -ForegroundColor Green
-            Write-Host "  Using verified local archive (skipping re-download)!" -ForegroundColor Green
-            $zipToExtract = $existingLocalZip
+        if (-not [string]::IsNullOrWhiteSpace($ExpectedHash)) {
+            Write-Host "  Verifying package integrity (SHA256)..." -NoNewline -ForegroundColor Gray
+            $localHash = (Get-FileHash -LiteralPath $existingLocalZip -Algorithm SHA256).Hash.ToUpper()
+            if ($localHash -eq $ExpectedHash.ToUpper()) {
+                Write-Host " VERIFIED [OK]" -ForegroundColor Green
+                Write-Host "  Using verified local archive (skipping re-download)!" -ForegroundColor Green
+                $zipToExtract = $existingLocalZip
+            } else {
+                Write-Host " MISMATCH (Incomplete or corrupt local file)" -ForegroundColor Yellow
+                Write-Host "  Expected: $ExpectedHash" -ForegroundColor Gray
+                Write-Host "  Found:    $localHash" -ForegroundColor Gray
+                Write-Host "  Downloading a fresh, verified copy from GitHub..." -ForegroundColor Cyan
+            }
         } else {
-            Write-Host " MISMATCH (Incomplete or corrupt local file)" -ForegroundColor Yellow
-            Write-Host "  Expected: $ExpectedHash" -ForegroundColor Gray
-            Write-Host "  Found:    $localHash" -ForegroundColor Gray
-            Write-Host "  Downloading a fresh, verified copy from GitHub..." -ForegroundColor Cyan
+            Write-Host "  Using local archive: $existingLocalZip" -ForegroundColor Green
+            $zipToExtract = $existingLocalZip
         }
     }
 
@@ -243,16 +260,20 @@ function Download-And-Install-Pack {
             Write-Host "  Download complete in $([math]::Round($sw.Elapsed.TotalSeconds, 1))s." -ForegroundColor Green
 
             # Verify SHA256 Checksum
-            Write-Host "  Verifying package integrity (SHA256)..." -NoNewline -ForegroundColor Gray
-            $computedHash = (Get-FileHash -LiteralPath $tempZip -Algorithm SHA256).Hash.ToUpper()
+            if (-not [string]::IsNullOrWhiteSpace($ExpectedHash)) {
+                Write-Host "  Verifying package integrity (SHA256)..." -NoNewline -ForegroundColor Gray
+                $computedHash = (Get-FileHash -LiteralPath $tempZip -Algorithm SHA256).Hash.ToUpper()
 
-            if ($computedHash -ne $ExpectedHash.ToUpper()) {
-                Write-Host " MISMATCH!" -ForegroundColor Red
-                Write-Host "  Expected: $ExpectedHash" -ForegroundColor Red
-                Write-Host "  Received: $computedHash" -ForegroundColor Red
-                throw "Downloaded file failed SHA256 integrity verification. The file may be corrupt or interrupted."
+                if ($computedHash -ne $ExpectedHash.ToUpper()) {
+                    Write-Host " MISMATCH!" -ForegroundColor Red
+                    Write-Host "  Expected: $ExpectedHash" -ForegroundColor Red
+                    Write-Host "  Received: $computedHash" -ForegroundColor Red
+                    throw "Downloaded file failed SHA256 integrity verification. The file may be corrupt or interrupted."
+                }
+                Write-Host " VERIFIED [OK]" -ForegroundColor Green
+            } else {
+                Write-Host "  Package downloaded successfully." -ForegroundColor Green
             }
-            Write-Host " VERIFIED [OK]" -ForegroundColor Green
 
             $zipToExtract = $tempZip
             $isTempZip = $true
@@ -311,8 +332,10 @@ try {
 
     $usgsDir = Join-Path $tilesDir "USGSTopo"
     $osmDir = Join-Path $tilesDir "OSM"
+    $imageryDir = Join-Path $tilesDir "USGSImageryTopo"
     New-Item -ItemType Directory -Force -Path $usgsDir | Out-Null
     New-Item -ItemType Directory -Force -Path $osmDir | Out-Null
+    New-Item -ItemType Directory -Force -Path $imageryDir | Out-Null
 
     # If running from a download/extracted folder outside the game directory:
     # Check if that download folder already has tiles and sync them!
@@ -322,7 +345,8 @@ try {
         if (Test-Path -LiteralPath $srcTilesDir) {
             $syncedUsgs = Sync-TilesFromFolder -SourceFolder $srcTilesDir -TargetFolder $tilesDir -PackSubDir "USGSTopo"
             $syncedOsm = Sync-TilesFromFolder -SourceFolder $srcTilesDir -TargetFolder $tilesDir -PackSubDir "OSM"
-            if ($syncedUsgs -gt 0 -or $syncedOsm -gt 0) {
+            $syncedImagery = Sync-TilesFromFolder -SourceFolder $srcTilesDir -TargetFolder $tilesDir -PackSubDir "USGSImageryTopo"
+            if ($syncedUsgs -gt 0 -or $syncedOsm -gt 0 -or $syncedImagery -gt 0) {
                 Write-Host "  [OK] Successfully synced existing tiles from download folder into game directory!" -ForegroundColor Green
                 Write-Host ""
             }
@@ -340,7 +364,7 @@ try {
         }
         Write-Host ""
         Write-Host "  Installed Tile Status in Railroader:" -ForegroundColor White
-        Write-Host "    1. USGS Topographic: " -NoNewline -ForegroundColor Gray
+        Write-Host "    1. USGS Topographic:      " -NoNewline -ForegroundColor Gray
         if ($counts.USGS -ge $USGS_EXPECTED_TILES) {
             Write-Host "$($counts.USGS.ToString('N0')) tiles installed [Complete OK]" -ForegroundColor Green
         } elseif ($counts.USGS -gt 0) {
@@ -349,11 +373,20 @@ try {
             Write-Host "Not installed" -ForegroundColor Yellow
         }
 
-        Write-Host "    2. OpenStreetMap:    " -NoNewline -ForegroundColor Gray
+        Write-Host "    2. OpenStreetMap:         " -NoNewline -ForegroundColor Gray
         if ($counts.OSM -ge $OSM_EXPECTED_TILES) {
             Write-Host "$($counts.OSM.ToString('N0')) tiles installed [Complete OK]" -ForegroundColor Green
         } elseif ($counts.OSM -gt 0) {
             Write-Host "$($counts.OSM.ToString('N0')) tiles installed [Partial: $($counts.OSM)/$OSM_EXPECTED_TILES]" -ForegroundColor Yellow
+        } else {
+            Write-Host "Not installed" -ForegroundColor Yellow
+        }
+
+        Write-Host "    3. USGS Satellite & Topo: " -NoNewline -ForegroundColor Gray
+        if ($counts.ImageryTopo -ge $IMAGERY_TOPO_EXPECTED_TILES) {
+            Write-Host "$($counts.ImageryTopo.ToString('N0')) tiles installed [Complete OK]" -ForegroundColor Green
+        } elseif ($counts.ImageryTopo -gt 0) {
+            Write-Host "$($counts.ImageryTopo.ToString('N0')) tiles installed [Partial: $($counts.ImageryTopo)/$IMAGERY_TOPO_EXPECTED_TILES]" -ForegroundColor Yellow
         } else {
             Write-Host "Not installed" -ForegroundColor Yellow
         }
@@ -367,13 +400,16 @@ try {
         Write-Host "    [2] Download / Update OpenStreetMap Pack (~$OSM_SIZE_MB, $OSM_EXPECTED_TILES tiles, Zooms 12-17)" -ForegroundColor White
         Write-Host "        High-contrast GIS roads, rivers, street networks & rail yard sidings." -ForegroundColor Gray
         Write-Host ""
-        Write-Host "    [3] Download / Update BOTH Packs (~768 MB Total)" -ForegroundColor White
-        Write-Host "        Recommended for instant dual-provider toggling in the game." -ForegroundColor Gray
+        Write-Host "    [3] Download / Update USGS Satellite & Topo Pack (~$IMAGERY_TOPO_SIZE_MB, $IMAGERY_TOPO_EXPECTED_TILES tiles, Zooms 12-16)" -ForegroundColor White
+        Write-Host "        NAIP aerial photography with elevation contours, waterways, and station labels." -ForegroundColor Gray
         Write-Host ""
-        Write-Host "    [4] Verify Installed Tiles Integrity" -ForegroundColor White
-        Write-Host "    [5] Exit" -ForegroundColor White
+        Write-Host "    [4] Download / Update ALL 3 Packs (~1.65 GB Total)" -ForegroundColor White
+        Write-Host "        Recommended for instant multi-provider toggling in the game." -ForegroundColor Gray
+        Write-Host ""
+        Write-Host "    [5] Verify Installed Tiles Integrity" -ForegroundColor White
+        Write-Host "    [6] Exit" -ForegroundColor White
         Write-Host "======================================================================" -ForegroundColor Cyan
-        Write-Host "  Enter choice (1-5): " -NoNewline -ForegroundColor White
+        Write-Host "  Enter choice (1-6): " -NoNewline -ForegroundColor White
         $choice = Read-Host
 
         if ($choice -eq "1") {
@@ -381,7 +417,7 @@ try {
             if ($res) {
                 Write-Host ""
                 Write-Host "  [TIP] In Railroader, press [Ctrl+M], set Map Background to 'Map Tiles'," -ForegroundColor Cyan
-                Write-Host "        and select 'USGSTopo' from the Tile Set dropdown!" -ForegroundColor Cyan
+                Write-Host "        and select 'USGS Topo' from the Tile Set dropdown!" -ForegroundColor Cyan
             }
         }
         elseif ($choice -eq "2") {
@@ -389,24 +425,34 @@ try {
             if ($res) {
                 Write-Host ""
                 Write-Host "  [TIP] In Railroader, press [Ctrl+M], set Map Background to 'Map Tiles'," -ForegroundColor Cyan
-                Write-Host "        and select 'OSM' from the Tile Set dropdown!" -ForegroundColor Cyan
+                Write-Host "        and select 'OpenStreetMap' from the Tile Set dropdown!" -ForegroundColor Cyan
             }
         }
         elseif ($choice -eq "3") {
-            Write-Host ""
-            Write-Host "  Installing BOTH offline tile packs into game directory..." -ForegroundColor Cyan
-            Download-And-Install-Pack -PackName "OpenStreetMap Corridor Pack" -Url $OSM_URL -ExpectedHash $OSM_HASH -TargetSubDir $osmDir -ExpectedTiles $OSM_EXPECTED_TILES -SourceDir $sourceDir
-            Download-And-Install-Pack -PackName "USGS Topographic Corridor Pack" -Url $USGS_URL -ExpectedHash $USGS_HASH -TargetSubDir $usgsDir -ExpectedTiles $USGS_EXPECTED_TILES -SourceDir $sourceDir
-            Write-Host ""
-            Write-Host "  [TIP] Both tile sets are installed in Railroader! Press [Ctrl+M]" -ForegroundColor Green
-            Write-Host "        and toggle freely between 'USGSTopo' and 'OSM' anytime!" -ForegroundColor Green
+            $res = Download-And-Install-Pack -PackName "USGS Satellite & Topo Corridor Pack" -Url $IMAGERY_TOPO_URL -ExpectedHash $IMAGERY_TOPO_HASH -TargetSubDir $imageryDir -ExpectedTiles $IMAGERY_TOPO_EXPECTED_TILES -SourceDir $sourceDir
+            if ($res) {
+                Write-Host ""
+                Write-Host "  [TIP] In Railroader, press [Ctrl+M], set Map Background to 'Map Tiles'," -ForegroundColor Cyan
+                Write-Host "        and select 'USGS Satellite (Imagery & Topo)' from the Tile Set dropdown!" -ForegroundColor Cyan
+            }
         }
         elseif ($choice -eq "4") {
             Write-Host ""
+            Write-Host "  Installing ALL 3 offline tile packs into game directory..." -ForegroundColor Cyan
+            Download-And-Install-Pack -PackName "OpenStreetMap Corridor Pack" -Url $OSM_URL -ExpectedHash $OSM_HASH -TargetSubDir $osmDir -ExpectedTiles $OSM_EXPECTED_TILES -SourceDir $sourceDir
+            Download-And-Install-Pack -PackName "USGS Topographic Corridor Pack" -Url $USGS_URL -ExpectedHash $USGS_HASH -TargetSubDir $usgsDir -ExpectedTiles $USGS_EXPECTED_TILES -SourceDir $sourceDir
+            Download-And-Install-Pack -PackName "USGS Satellite & Topo Corridor Pack" -Url $IMAGERY_TOPO_URL -ExpectedHash $IMAGERY_TOPO_HASH -TargetSubDir $imageryDir -ExpectedTiles $IMAGERY_TOPO_EXPECTED_TILES -SourceDir $sourceDir
+            Write-Host ""
+            Write-Host "  [TIP] All 3 tile sets are installed in Railroader! Press [Ctrl+M]" -ForegroundColor Green
+            Write-Host "        and toggle freely between Topo, OSM, and Satellite anytime!" -ForegroundColor Green
+        }
+        elseif ($choice -eq "5") {
+            Write-Host ""
             Write-Host "  Verifying installed tile files in: $tilesDir" -ForegroundColor Cyan
             $current = Get-TileCounts -TilesDir $tilesDir
-            Write-Host "  USGS Topo tiles present: $($current.USGS.ToString('N0'))" -ForegroundColor White
-            Write-Host "  OpenStreetMap tiles present: $($current.OSM.ToString('N0'))" -ForegroundColor White
+            Write-Host "  USGS Topo tiles present:            $($current.USGS.ToString('N0'))" -ForegroundColor White
+            Write-Host "  OpenStreetMap tiles present:         $($current.OSM.ToString('N0'))" -ForegroundColor White
+            Write-Host "  USGS Satellite & Topo tiles present: $($current.ImageryTopo.ToString('N0'))" -ForegroundColor White
             if ($current.USGS -ge $USGS_EXPECTED_TILES) {
                 Write-Host "  [OK] USGS Topo pack is complete." -ForegroundColor Green
             } else {
@@ -417,14 +463,19 @@ try {
             } else {
                 Write-Host "  [WARN] OpenStreetMap has $($current.OSM) tiles (full pack is $OSM_EXPECTED_TILES tiles)." -ForegroundColor Yellow
             }
+            if ($current.ImageryTopo -ge $IMAGERY_TOPO_EXPECTED_TILES) {
+                Write-Host "  [OK] USGS Satellite & Topo pack is complete." -ForegroundColor Green
+            } else {
+                Write-Host "  [WARN] USGS Satellite & Topo has $($current.ImageryTopo) tiles (full pack is $IMAGERY_TOPO_EXPECTED_TILES tiles)." -ForegroundColor Yellow
+            }
         }
-        elseif ($choice -eq "5" -or $choice -eq "q" -or $choice -eq "exit") {
+        elseif ($choice -eq "6" -or $choice -eq "q" -or $choice -eq "exit") {
             Write-Host ""
             Write-Host "Exiting Tile Downloader. Happy Railroading!" -ForegroundColor Green
             break
         }
         else {
-            Write-Host "Invalid option. Please choose 1, 2, 3, 4, or 5." -ForegroundColor Yellow
+            Write-Host "Invalid option. Please choose 1, 2, 3, 4, 5, or 6." -ForegroundColor Yellow
         }
 
         Write-Host ""
