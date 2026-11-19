@@ -58,8 +58,8 @@ Download compiled mod releases and optional tile packs directly from the **[GitH
 
 | Package | Content | Size |
 |---|---|---|
-| **`reaper-mapenhancer-2.0.17.zip`** *(Complete Edition)* | Full mod binaries (`MapEnhancer.dll`), Harmony, UI assets, `install.bat`, and `downloadtiles.bat` | ~1.8 MB |
-| **`reaper-mapenhancer-2.0.17-nexus.zip`** *(Nexus Mods Edition)* | Clean mod binaries, Harmony, UI assets, and guides (zero `.bat` scripts for instant security clearance) | ~1.8 MB |
+| **`reaper-mapenhancer-2.0.18.zip`** *(Complete Edition)* | Full mod binaries (`MapEnhancer.dll`), Harmony, UI assets, `install.bat`, and `downloadtiles.bat` | ~1.8 MB |
+| **`reaper-mapenhancer-2.0.18-nexus.zip`** *(Nexus Mods Edition)* | Clean mod binaries, Harmony, UI assets, and guides (zero `.bat` scripts for instant security clearance) | ~1.8 MB |
 | **`MapEnhancer_Tiles_USGSImageryTopo_Andrews_to_Sylva.zip`** | 100% offline USGS Satellite (NAIP) + Topo corridor tiles (Zoom 12–16) | 926 MB |
 | **`MapEnhancer_Tiles_USGSTopo_Andrews_to_Sylva.zip`** | 100% offline USGS Topographical corridor tiles (Zoom 12–16) | 692 MB |
 | **`MapEnhancer_Tiles_OSM_Andrews_to_Sylva.zip`** | 100% offline OpenStreetMap corridor tiles (Zoom 12–17) | 76.5 MB |

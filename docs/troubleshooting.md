@@ -87,7 +87,7 @@ If your problem is not covered in this guide, report the issue through our offic
 ### What to include in your report:
 
 - Exact Railroader version (e.g. `0.6.2 Experimental`)
-- Map Enhancer version (e.g. `v2.0.17`)
+- Map Enhancer version (e.g. `v2.0.18`)
 - Relevant error snippet or stack trace from `Player.log`
 - Steps to reproduce the issue
 - List of other installed mods

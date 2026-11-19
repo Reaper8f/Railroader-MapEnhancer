@@ -4,8 +4,8 @@
 Download published releases from the **[GitHub Releases](../../releases)** page, the **[Official Website](https://mapenhancer.refizar.in/download)**, or from **[Nexus Mods #18](https://www.nexusmods.com/railroader/mods/18)**.
 
 ### What is the difference between the Complete Package and the Nexus Mods Edition?
-- **Complete Package (`reaper-mapenhancer-2.0.17.zip`)**: Downloaded from the website or GitHub releases. Contains the full mod files plus **`install.bat`** (automated installer/updater) and **`downloadtiles.bat`** (automated tile downloader).
-- **Nexus Mods Edition (`reaper-mapenhancer-2.0.17-nexus.zip`)**: Downloaded from Nexus Mods. Contains the identical game mod binaries, marker textures, and documentation, but **omits all `.bat` scripts**. This ensures instant automated security approval on Nexus Mods without quarantine delays.
+- **Complete Package (`reaper-mapenhancer-2.0.18.zip`)**: Downloaded from the website or GitHub releases. Contains the full mod files plus **`install.bat`** (automated installer/updater) and **`downloadtiles.bat`** (automated tile downloader).
+- **Nexus Mods Edition (`reaper-mapenhancer-2.0.18-nexus.zip`)**: Downloaded from Nexus Mods. Contains the identical game mod binaries, marker textures, and documentation, but **omits all `.bat` scripts**. This ensures instant automated security approval on Nexus Mods without quarantine delays.
 
 ### Why does the Nexus Mods edition have no `.bat` scripts?
 Nexus Mods' automated security scanners flag archives containing `.bat`, `.cmd`, or script executables and place them in automated quarantine for manual staff review. To give players immediate, instant access to releases without security delays, the Nexus release is provided as a clean archive of binaries and assets.
@@ -16,7 +16,7 @@ You have two simple options:
 2. **Download Tile Script:** Grab `downloadtiles.bat` from the GitHub repository `tools/` folder, place it in your mod directory, and double-click it.
 
 ### Which Railroader versions are supported?
-Map Enhancer 2.0 targets **Railroader 0.6.0+ Experimental** (native C# modding). It is actively tested and verified on Railroader 0.6.0 through 0.6.2+.
+Map Enhancer 2.0 targets **Railroader 0.6.0+ Experimental** (native C# modding). It is actively tested and verified on Railroader 0.6.0 through 0.6.3+.
 
 ### Does Map Enhancer require Unity Mod Manager (UMM)?
 **No.** Railroader 0.6 introduced native mod loading. Map Enhancer runs entirely as a native mod located in `Documents\Railroader\Mods\reaper-map-enhancer\`. You do not need to patch game files with UMM.
@@ -33,7 +33,7 @@ Map Enhancer 2.0 targets **Railroader 0.6.0+ Experimental** (native C# modding).
 "clientMods": [
   {
     "identifier": "reaper/map-enhancer",
-    "version": "2.0.17",
+    "version": "2.0.18",
     "enabled": true,
     "scope": 2
   }

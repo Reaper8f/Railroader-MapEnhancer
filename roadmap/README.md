@@ -10,6 +10,8 @@ Our core design principle: **Operational realism, dispatching ease, and player i
 
 | Status             | Focus Area                        | Description                                                                           |     Target     |
 | :----------------- | :-------------------------------- | :------------------------------------------------------------------------------------ | :------------: |
+| 🟢 **Completed**   | **Railroader 0.6.3 Compatibility**| Full compatibility update for RR 0.6.3 (SwitchDescriptor, Windows, Dispatch & Ops).  |  **v2.0.18**   |
+| 🟢 **Completed**   | **Pre-Release & Verified Updates**| Update Checker pre-release build detection and strict cryptographic SHA256 checking.  |  **v2.0.18**   |
 | 🟢 **Completed**   | **USGS Satellite & Topo Pack**    | 3rd offline tile pack (`USGSImageryTopo`, NAIP orthoimagery + contours & labels).     |  **v2.0.17**   |
 | 🟢 **Completed**   | **3 Hover HUD Modes & Window**    | Attached, Cursor, and detached Inspection HUD window (`Ctrl+H`) with Loco+Consist.    |  **v2.0.17**   |
 | 🟢 **Completed**   | **Intelligent Coupling Dispatch** | Coupling-point availability checks, run-around/reverse routing, Route Preview hotkey.  |  **v2.0.17**   |

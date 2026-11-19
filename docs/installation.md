@@ -10,8 +10,8 @@ Map Enhancer is distributed in two official release packages:
 
 | Package | Intended For | Contents |
 |:---|:---|:---|
-| **Complete Package**<br>`reaper-mapenhancer-2.0.17.zip` | Website & GitHub users wanting 1-click automated setup | Mod binaries (`MapEnhancer.dll`, `0Harmony.dll`), marker icons, `Info.json`, plus **`install.bat`** (automated installer/updater) and **`downloadtiles.bat`** (offline tile downloader). |
-| **Nexus Mods Edition**<br>`reaper-mapenhancer-2.0.17-nexus.zip` | Nexus Mods downloaders | Clean mod binaries, marker icons, `Info.json`, and guides. Contains **zero batch scripts** to guarantee automated security verification and instant approval. |
+| **Complete Package**<br>`reaper-mapenhancer-2.0.18.zip` | Website & GitHub users wanting 1-click automated setup | Mod binaries (`MapEnhancer.dll`, `0Harmony.dll`), marker icons, `Info.json`, plus **`install.bat`** (automated installer/updater) and **`downloadtiles.bat`** (offline tile downloader). |
+| **Nexus Mods Edition**<br>`reaper-mapenhancer-2.0.18-nexus.zip` | Nexus Mods downloaders | Clean mod binaries, marker icons, `Info.json`, and guides. Contains **zero batch scripts** to guarantee automated security verification and instant approval. |
 
 ---
 
@@ -29,7 +29,7 @@ When updating Map Enhancer to a newer version:
 
 ## Method 1: Automated 1-Click Installer (Complete Package)
 
-*Included in the **Complete Package** (`reaper-mapenhancer-2.0.17.zip`).*
+*Included in the **Complete Package** (`reaper-mapenhancer-2.0.18.zip`).*
 
 1. Download the Complete Package from the [Website](https://mapenhancer.refizar.in/download) or [GitHub Releases](../../releases).
 2. Extract the archive into any temporary location (e.g. your `Downloads` folder).

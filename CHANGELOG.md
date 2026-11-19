@@ -8,6 +8,30 @@ Download release packages and view assets on the **[GitHub Releases page](../../
 
 ---
 
+## [2.0.18] — 2026-11-19
+
+### Railroader 0.6.3 Compatibility, Pre-Release Detection & Verified Checksums
+
+### Added
+
+- **Pre-Release Build Detection:** Update Checker now detects when the local mod build is ahead of the published release catalog, displaying `<color=#60A5FA>Pre-release (v{version})</color>` in ME Settings (`Ctrl+M`) instead of mistakenly reporting "Latest version".
+- **Strict Checksum Verification:** "Latest version" status is now strictly conditioned on both the semantic version and the compiled `MapEnhancer.dll` SHA256 checksum matching the official API release catalog.
+- **Station Agent Auto-Resolution:** Added native `agent.ResolvePassengerStop` integration for Railroader 0.6.3+ when opening station windows from map passenger stop markers.
+
+### Changed
+
+- **Track Descriptor Architecture:** Migrated switch lookups from nested `TrackObjectManager.SwitchDescriptor` to the top-level `Track.SwitchDescriptor` type and `TrackDescriptorSet.Switches` dictionary.
+- **Window Resizing Engine:** Adapted map resizing logic to Railroader 0.6.3's native window persistence and sizing system (`UI.Windows.WindowConfig`), replacing deprecated `InitialContentSize` with dynamic `GetContentSize()` and persistent layout dimensions.
+- **Dispatch Route Method Bindings:** Updated `AutoEngineerPlanner.TryPlanRoute` invocation to pass the required `out RouteSearch.Step arrival` parameter along with momentum and arrival turns.
+- **Station Agent Reflection:** Updated reflection lookups to accommodate private field renamings (`_stationId`, `_passengerStop`) with resilient multi-candidate lookups.
+
+### Fixed
+
+- **Railroader 0.6.3 Compatibility:** Fixed startup and compilation breakages caused by internal API restructuring in Railroader 0.6.3 Experimental.
+- **Update Toast Notification Suppression:** First-map-load update notification toasts are properly suppressed when running pre-release or development builds.
+
+---
+
 ## [2.0.17] — 2026-11-11
 
 ### USGS Satellite & Topo Tiles, Dedicated Inspection HUD & Intelligent Coupling Dispatch

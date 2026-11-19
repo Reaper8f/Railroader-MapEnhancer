@@ -1,8 +1,8 @@
 # Map Enhancer for Railroader — Comprehensive Features Guide
 
-**Target Game Version:** Railroader 0.6.0+ Experimental  
-**Current Mod Version:** v2.0.17  
-**Package:** `reaper-mapenhancer-2.0.17.zip`  
+**Target Game Version:** Railroader 0.6.0+ / 0.6.3 Experimental  
+**Current Mod Version:** v2.0.18  
+**Package:** `reaper-mapenhancer-2.0.18.zip`  
 **Official Website:** [https://mapenhancer.refizar.in](https://mapenhancer.refizar.in)  
 **My Discord:** [https://discord.refizar.in](https://discord.refizar.in)  
 **RailRoader Discord:** [https://discord.gg/r8xeTPAnhw](https://discord.gg/r8xeTPAnhw)
@@ -992,6 +992,7 @@ Robust diagnostic and auditing tools for single-player troubleshooting and multi
 - **v2.0.15** — Interactive click-to-dispatch waypoints (`CapsLock`), click-to-couple consist automation, live route preview tracing, right-click car context menu, smart handbrakes engine, track and yard sign placement.
 - **v2.0.16** — Topographic map backgrounds (USGS Topo, OpenStreetMap live slippy tiles, custom images), physical safe speed curvature overlay, CTC passing siding BFS propagation fix, sub-segment industry delivery slicing, upright sign text fix, settings & tile asset preservation during updates, car marker length and width trimming sliders, consist car depth filing/shingling, alternating consist colors (zebra contrast with in-game toggle), and selected car/locomotive map outline highlighting (animated golden pulse halo, combined steam engine + tender support, and vertical depth boost).
 - **v2.0.17** — Added 3rd offline corridor tile pack (**USGS Satellite & Topo / `USGSImageryTopo`** with USDA NAIP aerials + contours & place labels, 926 MB), 3 selectable **Hover HUD Display Modes** including a detached, resizable **Inspection HUD window** (`Ctrl+H` toggle hotkey & conditional map `HUD` button), reorganized entity views unifying locomotive + tender + consist telemetry, **Intelligent Coupling-Point Dispatch** with occupied-end run-around route planning, **Live Route Preview** keybind, toggleable Track Class/Condition/Speed & Weed Growth hover details paired with **Per-Class vs Overall Condition** metric alignment, Linux/Proton archive path normalization, and updated installers/documentation.
+- **v2.0.18** — Full compatibility update for **Railroader 0.6.3 Experimental**: adapted to unnested `Track.SwitchDescriptor` and `TrackDescriptorSet.Switches` property, migrated to `UI.Windows.Window` native resizing and layout persistence engine (`GetContentSize` / `WindowConfig`), updated `AutoEngineerPlanner.TryPlanRoute` bindings with arrival step parameter, modernized `StationAgent` private reflection lookups (`_stationId`, `_passengerStop`) with native `ResolvePassengerStop` integration, and enhanced Update Checker with **Pre-Release build detection** and strict cryptographic SHA256 checksum verification.
 
 ---
 
